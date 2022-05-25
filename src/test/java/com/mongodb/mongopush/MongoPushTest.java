@@ -10,6 +10,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.mongodb.mongopush.exec.ExecuteResultHandler;
+
 @ExtendWith({SpringExtension.class})
 @TestPropertySource("/test.properties")
 @ContextConfiguration(locations = "/test-context.xml")
@@ -32,15 +34,10 @@ class MongoPushTest {
 			}
 		}
 		
-		ExecuteResultHandler executeResultHandler = mongopushRunner.getExecuteResultHandler();
-		int exit = executeResultHandler.getExitValue();
-		if (exit != 0) {
-			ExecuteException e = executeResultHandler.getException();
-			throw e;
-		}
+		mongopushRunner.shutdown();
 	}
 
-	@Test
+	//@Test
 	void test() throws ExecuteException, IOException {
 		mongopushRunner.execute();
 		

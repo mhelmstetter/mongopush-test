@@ -1,4 +1,4 @@
-package com.mongodb.mongopush;
+package com.mongodb.mongopush.exec;
 
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;

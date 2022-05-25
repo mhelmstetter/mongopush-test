@@ -1,4 +1,4 @@
-package com.mongodb.mongopush;
+package com.mongodb.mongopush.exec;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,6 +11,7 @@ import org.apache.commons.exec.LogOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.mongopush.MongopushRunner;
 import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
 

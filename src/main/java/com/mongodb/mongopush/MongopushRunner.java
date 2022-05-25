@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
@@ -13,6 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.exec.ExecBasicLogHandler;
+import com.mongodb.mongopush.exec.ExecuteResultHandler;
+import com.mongodb.mongopush.exec.ProcessExecutor;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
 
 @Component
@@ -30,6 +32,7 @@ public class MongopushRunner implements MongopushStatusListener {
 	private String target;
 	
 
+	private ProcessExecutor executor;
 	private ExecuteResultHandler executeResultHandler;
 
 	private CommandLine cmdLine;
@@ -68,12 +71,17 @@ public class MongopushRunner implements MongopushStatusListener {
 
 		PumpStreamHandler psh = new PumpStreamHandler(new ExecBasicLogHandler("mongopush", this));
 
-		DefaultExecutor executor = new DefaultExecutor();
+		executor = new ProcessExecutor();
 		executor.setExitValue(0);
 		executor.setStreamHandler(psh);
 
 		executor.execute(cmdLine, executeResultHandler);
 
+	}
+	
+	public void shutdown() throws IOException {
+		logger.debug("shutdown() initiated");
+		executor.stop();
 	}
 
 	private void addArg(String argName) {
