@@ -9,5 +9,19 @@
 	
     
     <context:component-scan base-package="com.mongodb.mongopush" />
+    <context:component-scan base-package="com.mongodb" />
+    
+    <context:property-placeholder location="classpath:test.properties"/>
+    
+    
+    <bean id="sourceTestClient" class="com.mongodb.test.MongoTestClient">
+    	<constructor-arg index="0" value="source"/>
+    	<constructor-arg index="1" value="${source}"/>
+	</bean>
+	
+	<bean id="targetTestClient" class="com.mongodb.test.MongoTestClient">
+    	<constructor-arg index="0" value="target"/>
+    	<constructor-arg index="1" value="${target}"/>
+	</bean>
     
 </beans>

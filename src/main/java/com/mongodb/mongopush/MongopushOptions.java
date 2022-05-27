@@ -3,17 +3,20 @@ package com.mongodb.mongopush;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.mongodb.model.Namespace;
+
 public class MongopushOptions {
 	
 	private final MongopushMode mode;
 	private final Set<IncludeOption> includeOptions;
+	private final Set<Namespace> includeNamespaces;
 	
 	
 	
-	private MongopushOptions(final MongopushMode mode, Set<IncludeOption> includeOptions) {
+	private MongopushOptions(final MongopushMode mode, Set<IncludeOption> includeOptions, Set<Namespace> includeNamespaces) {
 		this.mode = mode;
 		this.includeOptions = includeOptions;
-		
+		this.includeNamespaces = includeNamespaces;
 	}
 	
 	public static final class IncludeOption {
@@ -48,6 +51,7 @@ public class MongopushOptions {
 		
 		private MongopushMode mode;
 		private final Set<IncludeOption> includeOptions = new HashSet<>();
+		private final Set<Namespace> includeNamespaces = new HashSet<>();
 		
 		public Builder mode(MongopushMode mode) {
 			this.mode = mode;
@@ -56,11 +60,12 @@ public class MongopushOptions {
 		
 		public Builder includeNamespace(String namespace) {
 			this.includeOptions.add(new IncludeOption(namespace));
+			this.includeNamespaces.add(new Namespace(namespace));
 			return this;
 		}
 		
 		public MongopushOptions build() {
-			return new MongopushOptions(mode, includeOptions);
+			return new MongopushOptions(mode, includeOptions, includeNamespaces);
 		}
 		
 	}
@@ -81,6 +86,12 @@ public class MongopushOptions {
 
 	public Set<IncludeOption> getIncludeOptions() {
 		return includeOptions;
+	}
+
+
+
+	public Set<Namespace> getIncludeNamespaces() {
+		return includeNamespaces;
 	}
 	
 	

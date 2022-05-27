@@ -10,16 +10,17 @@
 <configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d %-5p - %m%n</pattern>
+      <pattern>%d{HH:mm:ss} [%thread] %-5p %class{0} - %m%n</pattern>
     </encoder>
   </appender>
 
   <logger name="com.mongodb.mongopush" level="DEBUG"/>
+  <logger name="com.mongodb.test" level="DEBUG"/>
   <logger name="com.mongodb.diffutil" level="DEBUG"/>
 
 
   
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>
