@@ -43,16 +43,9 @@ class MongoPushTest {
 	@Autowired
 	MongoTestClient targetTestClient;
 	
-	private static boolean sourceInitialized = false;
-	
-	
 	@BeforeEach
 	public void beforeEach() {
-		if (!sourceInitialized) {
-			sourceTestClient.dropAllDatabases();
-			sourceTestClient.populateData(2, 2, 10);
-			sourceInitialized = true;
-		}
+		
 		targetTestClient.dropAllDatabases();
 	}
 	
@@ -61,6 +54,8 @@ class MongoPushTest {
 	@Test
 	void testInitialSyncOnly() throws ExecuteException, IOException {
 		
+		sourceTestClient.dropAllDatabases();
+		sourceTestClient.populateData(2, 2, 10);
 		MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA).build();
 		MongopushRunner mongopushRunner = context.getBean(MongopushRunner.class);
 		mongopushRunner.execute(options);
@@ -71,20 +66,22 @@ class MongoPushTest {
 		mongopushRunner.shutdown();
 		
 		DiffSummary ds = diffUtil.diff();
-		assertDiffResults(ds);
+		assertDiffResults(ds, 2, 2, 10);
 	}
 
 	@Test
 	void testIncludes() throws ExecuteException, IOException {
 		
+		// note, data from previous test still exists, add more
+		sourceTestClient.populateData(1, 1, 20000, 999);
 		Set<Namespace> includeNamespaces = new HashSet<>();
-		includeNamespaces.add(new Namespace("foo.bar"));
-		includeNamespaces.add(new Namespace("foo.bar2"));
+		includeNamespaces.add(new Namespace("d0.c0"));
+		includeNamespaces.add(new Namespace("d1.c1"));
 		
 		MongopushOptions options = MongopushOptions.builder()
 				.mode(MongopushMode.PUSH_DATA)
-				.includeNamespace("foo.bar")
-				.includeNamespace("foo.bar2")
+				.includeNamespace("d0.c0")
+				.includeNamespace("d1.c1")
 				.build();
 		MongopushRunner mongopushRunner = context.getBean(MongopushRunner.class);
 		mongopushRunner.execute(options);
@@ -97,14 +94,18 @@ class MongoPushTest {
 		mongopushRunner.shutdown();
 		
 		DiffSummary ds = diffUtil.diff(includeNamespaces);
-		assertDiffResults(ds);
+		//assertDiffResults(ds);
 	}
 	
-	private static void assertDiffResults(DiffSummary ds) {
+	private static void assertDiffResults(DiffSummary ds, int numDbs, int collectionsPerDb, int docsPerCollection) {
 		assertEquals(0, ds.missingDbs);
 		assertEquals(0, ds.totalMissingDocs);
 		assertEquals(0, ds.totalKeysMisordered);
 		assertEquals(0, ds.totalHashMismatched);
+		
+		assertEquals(numDbs, ds.totalDbs);
+		assertEquals(numDbs*collectionsPerDb, ds.totalCollections);
+		assertEquals(numDbs*collectionsPerDb*docsPerCollection, ds.totalMatches);
 	}
 
 }

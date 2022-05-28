@@ -13,8 +13,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>16</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 
 		<spring.version>5.3.20</spring.version>
 		<slf4j.version>1.7.30</slf4j.version>
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>com.helmstetter</groupId>
 			<artifactId>mongo-util</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 		</dependency>
 		
 		<dependency>

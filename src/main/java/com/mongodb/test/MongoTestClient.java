@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCommandException;
+import com.mongodb.MongoException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -40,6 +41,9 @@ public class MongoTestClient {
 
 	private MongoClient mongoClient;
 	
+	// are we connecting to mongos or mongod
+	private boolean mongos;
+	
 	public MongoTestClient(String name, String clusterUri) {
 		this.name = name;
 		this.connectionString = new ConnectionString(clusterUri);
@@ -53,9 +57,21 @@ public class MongoTestClient {
 				.uuidRepresentation(UuidRepresentation.STANDARD)
 				.build();
 		mongoClient = MongoClients.create(mongoClientSettings);
+		
+		try {
+			Document dbgridResult = adminCommand(new Document("isdbgrid", 1));
+			Integer dbgrid = dbgridResult.getInteger("isdbgrid");
+			mongos = dbgrid.equals(1);
+		} catch (MongoException mce) {
+			// ignore not supported
+		}
 	}
 	
 	public void populateData(int numDbs, int collectionsPerDb, int docsPerCollection) {
+		populateData(numDbs, collectionsPerDb, docsPerCollection, 0);
+	}
+	
+	public void populateData(int numDbs, int collectionsPerDb, int docsPerCollection, int startDocNum) {
 		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
 		for (int dbNum = 0; dbNum < numDbs; dbNum++) {
 			String dbName = "db" + dbNum;
@@ -63,7 +79,7 @@ public class MongoTestClient {
 			for (int collNum = 0; collNum < collectionsPerDb; collNum++) {
 				String collName = "c" + collNum;
 				MongoCollection<Document> coll = db.getCollection(collName);
-				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
+				for (int docNum = startDocNum; docNum < docsPerCollection+startDocNum; docNum++) {
 					Document d = new Document("_id", docNum);
 					d.append("uuid", UUID.randomUUID());
 					d.append("startDate", fakerService.getRandomDate());
@@ -76,8 +92,18 @@ public class MongoTestClient {
 		}
 	}
 	
-	// TODO - this assumes sharded
 	public List<String> getAllDatabases() {
+		if (mongos) {
+			return getAllDatabasesSharded();
+		} else {
+			List<String> dbNames = new ArrayList<>();
+			mongoClient.listDatabaseNames().into(dbNames);
+			return dbNames;
+		}
+	}
+	
+	// TODO - this assumes sharded
+	public List<String> getAllDatabasesSharded() {
 		MongoCollection<Document> databasesColl = mongoClient.getDatabase("config").getCollection("databases");
 		FindIterable<Document> databases = databasesColl.find();
 		List<String> databasesList = new ArrayList<String>();
@@ -91,17 +117,21 @@ public class MongoTestClient {
 	
 	public void dropAllDatabases() {
 		for (String dbName : getAllDatabases()) {
-			if (!dbName.equals("admin")) {
+			if (!dbName.equals("admin") && !dbName.equals("config") && !dbName.equals("local")) {
 				logger.debug(name + " dropping " + dbName);
 				try {
 					mongoClient.getDatabase(dbName).drop();
 				} catch (MongoCommandException mce) {
-					logger.warn("Drop failed, brute forcing.", mce);
+					logger.error("Drop failed, brute forcing.", mce);
 					dropForce(dbName);
 				}
 
 			}
 		}
+	}
+	
+	public Document adminCommand(Document command) {
+		return mongoClient.getDatabase("admin").runCommand(command);
 	}
 	
 	private void dropForce(String dbName) {
