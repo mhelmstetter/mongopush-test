@@ -1,6 +1,6 @@
 package com.mongodb.pocdriver;
 
-import static com.mongodb.pocdriver.constants.POCDriverConstants.*;
+import static com.mongodb.mongopush.constants.MongoPushConstants.*;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

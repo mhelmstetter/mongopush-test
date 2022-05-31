@@ -1,6 +1,7 @@
 package com.mongodb.mongopush;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
@@ -19,9 +20,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.mongodb.diffutil.DiffSummary;
+import com.mongodb.diffutil.DiffUtilRunner;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.event.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.event.VerificationTaskFailedEvent;
 import com.mongodb.pocdriver.POCDriverRunner;
 import com.mongodb.pocdriver.config.POCDriverConfiguration;
 import com.mongodb.pocdriver.events.DocumentsInsertedCountEvent;
@@ -43,8 +48,8 @@ public class MongoPushTest01 {
 	@Autowired
 	MongopushRunner mongopushRunner;
 	
-//	@Autowired
-//	DiffUtilRunner diffUtilRunner;
+	@Autowired
+	DiffUtilRunner diffUtilRunner;
 	
 	@Autowired
 	POCDriverConfiguration pocDriverConfiguration;
@@ -70,13 +75,15 @@ public class MongoPushTest01 {
 		pocDriverRunner.documentsInsertedCount(new DocumentsInsertedCountEvent(0));
 		mongopushRunner.initialSyncCompleted(new InitialSyncCompletedEvent(null, false));
 		mongopushRunner.oplogStreamingCompleted(new OplogStreamingCompletedEvent(false));
+		mongopushRunner.verificationTaskComplete(new VerificationTaskCompleteEvent(false));
+		mongopushRunner.verificationTaskFailed(new VerificationTaskFailedEvent(false));
 	}
 	
 	@Test
 	@Order(1)
-	void mongoPushBasicTest() throws ExecuteException, IOException, InterruptedException {
+	void mongoPushBasicPushDataTest() throws ExecuteException, IOException, InterruptedException {
 		
-		logger.info("Running mongopush basic test");
+		logger.info("Running mongopush basic test with -push data");
 		pocDriverRunner.execute();
 		
 		while (true) {
@@ -101,15 +108,15 @@ public class MongoPushTest01 {
 			}
 		}
 		
-//		DiffSummary ds = diffUtilRunner.diff();
-//		assertDiffResults(ds);
+		DiffSummary ds = diffUtilRunner.diff();
+		assertDiffResults(ds);
 	}
 	
 	@Test
 	@Order(2)
-	void mongoPushLagZeroTest() throws ExecuteException, IOException, InterruptedException {
+	void mongoPushLagZeroPushDataTest() throws ExecuteException, IOException, InterruptedException {
 		
-		logger.info("Running mongopush lag 0 test");
+		logger.info("Running mongopush lag 0 test with -push data");
 		
 		pocDriverRunner.execute();
 		
@@ -137,17 +144,144 @@ public class MongoPushTest01 {
 			Thread.sleep(5000);
 			if (mongopushRunner.isOplogStreamingCompleted()) {
 				assertTrue(mongopushRunner.isOplogStreamingCompleted());
-				Thread.sleep(10000);
+				Thread.sleep(15000);
 				mongopushRunner.shutdown();
 				break;
 			}
 		}
+		
+		DiffSummary ds = diffUtilRunner.diff();
+		assertDiffResults(ds);
 	}
 	
-//	private static void assertDiffResults(DiffSummary ds) {
-//		assertEquals(0, ds.missingDbs);
-//		assertEquals(0, ds.totalMissingDocs);
-//		assertEquals(0, ds.totalKeysMisordered);
-//		assertEquals(0, ds.totalHashMismatched);
-//	}
+	@Test
+	@Order(3)
+	void mongoPushBasicPushDataOnlyTest() throws ExecuteException, IOException, InterruptedException {
+		
+		logger.info("Running mongopush basic test with -push data-only");
+		pocDriverRunner.execute();
+		
+		while (true) {
+			Thread.sleep(5000);
+			if (pocDriverRunner.isInitialDataInserted()) {
+				logger.info("Documents inserted - {}", pocDriverRunner.getDocumentsInsertedCount());
+				assertTrue(pocDriverRunner.getDocumentsInsertedCount() > pocDriverConfiguration.getInitialDocumentCount());
+				pocDriverRunner.shutdown();
+				MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY).build();
+				mongopushRunner.execute(options);
+				break;
+			}
+		}
+		
+		while (true) {
+			Thread.sleep(5000);
+			if(mongopushRunner.isInitialSyncComplete())
+			{
+				assertTrue(mongopushRunner.isInitialSyncComplete());
+				mongopushRunner.shutdown();
+				break;
+			}
+		}
+		
+		DiffSummary ds = diffUtilRunner.diff();
+		assertDiffResults(ds);
+	}
+	
+	@Test
+	@Order(4)
+	void mongoPushBasicPushDataOnlyVerifyTest() throws ExecuteException, IOException, InterruptedException {
+		
+		logger.info("Running mongopush basic test with -push data-only and -verify");
+		pocDriverRunner.execute();
+		
+		while (true) {
+			Thread.sleep(5000);
+			if (pocDriverRunner.isInitialDataInserted()) {
+				logger.info("Documents inserted - {}", pocDriverRunner.getDocumentsInsertedCount());
+				assertTrue(pocDriverRunner.getDocumentsInsertedCount() > pocDriverConfiguration.getInitialDocumentCount());
+				pocDriverRunner.shutdown();
+				MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY).build();
+				mongopushRunner.execute(options);
+				break;
+			}
+		}
+		
+		while (true) {
+			Thread.sleep(5000);
+			if(mongopushRunner.isInitialSyncComplete())
+			{
+				assertTrue(mongopushRunner.isInitialSyncComplete());
+				mongopushRunner.shutdown();
+				MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.VERIFY).build();
+				mongopushRunner.execute(options);
+				break;
+			}
+		}
+		
+		while (true) {
+			Thread.sleep(5000);
+			if(mongopushRunner.isVerificationTaskComplete())
+			{
+				assertTrue(mongopushRunner.isVerificationTaskComplete());
+				mongopushRunner.shutdown();
+				break;
+			}
+		}
+		
+		DiffSummary ds = diffUtilRunner.diff();
+		assertDiffResults(ds);
+	}
+	
+	@Test
+	@Order(5)
+	void mongoPushBasicPushDataOnlyVerifyFailedTest() throws ExecuteException, IOException, InterruptedException {
+		
+		logger.info("Running mongopush basic test with -push data-only and -verify");
+		pocDriverRunner.execute();
+		
+		while (true) {
+			Thread.sleep(5000);
+			if (pocDriverRunner.isInitialDataInserted()) {
+				logger.info("Documents inserted - {}", pocDriverRunner.getDocumentsInsertedCount());
+				assertTrue(pocDriverRunner.getDocumentsInsertedCount() > pocDriverConfiguration.getInitialDocumentCount());
+				//pocDriverRunner.shutdown();
+				MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY).build();
+				mongopushRunner.execute(options);
+				break;
+			}
+		}
+		
+		while (true) {
+			Thread.sleep(5000);
+			if(mongopushRunner.isInitialSyncComplete())
+			{
+				assertTrue(mongopushRunner.isInitialSyncComplete());
+				mongopushRunner.shutdown();
+				pocDriverRunner.shutdown();
+				MongopushOptions options = MongopushOptions.builder().mode(MongopushMode.VERIFY).build();
+				mongopushRunner.execute(options);
+				break;
+			}
+		}
+		
+		while (true) {
+			Thread.sleep(5000);
+			if(mongopushRunner.isVerificationTaskFailed())
+			{
+				assertTrue(mongopushRunner.isVerificationTaskFailed());
+				mongopushRunner.shutdown();
+				break;
+			}
+		}
+		
+		//DiffSummary ds = diffUtilRunner.diff();
+		//assertDiffResults(ds);
+	}
+	
+	private static void assertDiffResults(DiffSummary ds) {
+		assertEquals(0, ds.missingDbs);
+		assertEquals(0, ds.totalMissingDocs);
+		assertEquals(0, ds.totalKeysMisordered);
+		assertEquals(0, ds.totalHashMismatched);
+	}
 }

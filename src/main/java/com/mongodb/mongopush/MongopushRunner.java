@@ -1,6 +1,6 @@
 package com.mongodb.mongopush;
 
-import static com.mongodb.pocdriver.constants.POCDriverConstants.COLON;
+import static com.mongodb.mongopush.constants.MongoPushConstants.PUSH;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,22 +11,20 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.event.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.event.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.exec.ExecBasicLogHandler;
 import com.mongodb.mongopush.exec.ExecuteResultHandler;
 import com.mongodb.mongopush.exec.ProcessExecutor;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
-import com.mongodb.pocdriver.config.POCDriverConfiguration;
 
 @Component
-//@Scope("prototype")
 public class MongopushRunner implements MongopushStatusListener {
 
 	private static Logger logger = LoggerFactory.getLogger(MongopushRunner.class);
@@ -54,6 +52,10 @@ public class MongopushRunner implements MongopushStatusListener {
 	private InitialSyncCompletedEvent initialSyncCompletedEvent;
 	private boolean oplogStreamingCompleted;
 	private OplogStreamingCompletedEvent oplogStreamingCompletedEvent;
+	private boolean verificationTaskComplete;
+	private VerificationTaskCompleteEvent verificationTaskCompleteEvent;
+	private boolean verificationTaskFailed;
+	private VerificationTaskFailedEvent verificationTaskFailedEvent;
 
 	public boolean isComplete() {
 		return executeResultHandler != null && executeResultHandler.hasResult();
@@ -75,7 +77,13 @@ public class MongopushRunner implements MongopushStatusListener {
 
 		switch (options.getMode()) {
 			case PUSH_DATA:
-				addArg("push", "data");
+				addArg(PUSH, MongopushMode.PUSH_DATA.getName());
+				break;
+			case PUSH_DATA_ONLY:
+				addArg(PUSH, MongopushMode.PUSH_DATA_ONLY.getName());
+				break;
+			case VERIFY:
+				addArg(MongopushMode.VERIFY.getName());
 				break;
 			default:
 				break;
@@ -165,5 +173,25 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	public boolean isOplogStreamingCompleted() {
 		return oplogStreamingCompleted;
+	}
+	
+	public void verificationTaskComplete(VerificationTaskCompleteEvent verificationTaskCompleteEvent) {
+		this.verificationTaskCompleteEvent = verificationTaskCompleteEvent;
+		logger.debug("***** Verification task complete {} *****", verificationTaskCompleteEvent.isVerificationTaskComplete());
+		verificationTaskComplete = verificationTaskCompleteEvent.isVerificationTaskComplete();
+	}
+
+	public boolean isVerificationTaskComplete() {
+		return verificationTaskComplete;
+	}
+	
+	public void verificationTaskFailed(VerificationTaskFailedEvent verificationTaskFailedEvent) {
+		this.verificationTaskFailedEvent = verificationTaskFailedEvent;
+		logger.debug("***** Verification task failed {} *****", verificationTaskFailedEvent.isVerificationTaskFailed());
+		verificationTaskFailed = verificationTaskFailedEvent.isVerificationTaskFailed();
+	}
+
+	public boolean isVerificationTaskFailed() {
+		return verificationTaskFailed;
 	}
 }

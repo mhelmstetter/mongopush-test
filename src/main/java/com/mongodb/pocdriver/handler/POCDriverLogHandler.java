@@ -1,6 +1,6 @@
 package com.mongodb.pocdriver.handler;
 
-import static com.mongodb.pocdriver.constants.POCDriverConstants.DOT_LOG;
+import static com.mongodb.mongopush.constants.MongoPushConstants.DOT_LOG;
 
 import java.io.BufferedReader;
 import java.io.File;
