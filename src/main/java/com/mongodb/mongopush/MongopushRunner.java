@@ -8,41 +8,50 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
+import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
 import com.mongodb.mongopush.exec.ExecBasicLogHandler;
 import com.mongodb.mongopush.exec.ExecuteResultHandler;
 import com.mongodb.mongopush.exec.ProcessExecutor;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
+import com.mongodb.pocdriver.config.POCDriverConfiguration;
 
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public class MongopushRunner implements MongopushStatusListener {
 
 	private static Logger logger = LoggerFactory.getLogger(MongopushRunner.class);
 
-	@Value("${mongopushBinary}")
-	private String mongopushBinary;
-
-	@Value("${source}")
-	private String source;
-
-	@Value("${target}")
-	private String target;
+//	@Value("${mongopushBinary}")
+//	private String mongopushBinary;
+//
+//	@Value("${source}")
+//	private String source;
+//
+//	@Value("${target}")
+//	private String target;
+	
+	@Autowired
+	MongoPushConfiguration mongoPushConfiguration;
 
 	private ProcessExecutor executor;
 	private ExecuteResultHandler executeResultHandler;
 
 	private CommandLine cmdLine;
 
-	private boolean initialSyncComplete;
 	private boolean processFailed;
 
+	private boolean initialSyncComplete;
 	private InitialSyncCompletedEvent initialSyncCompletedEvent;
+	private boolean oplogStreamingCompleted;
+	private OplogStreamingCompletedEvent oplogStreamingCompletedEvent;
 
 	public boolean isComplete() {
 		return executeResultHandler != null && executeResultHandler.hasResult();
@@ -54,10 +63,10 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	public void execute(MongopushOptions options) throws ExecuteException, IOException {
 
-		logger.debug("execute() MONGOPUSH_BINARY: " + mongopushBinary);
+		logger.debug("execute() MONGOPUSH_BINARY: " + mongoPushConfiguration.getMongopushBinary());
 
 		executeResultHandler = new ExecuteResultHandler(this);
-		cmdLine = new CommandLine(new File(mongopushBinary));
+		cmdLine = new CommandLine(new File(mongoPushConfiguration.getMongopushBinary()));
 
 		// this currently assumes that mongopush has been modified to accept command
 		// line only
@@ -75,8 +84,8 @@ public class MongopushRunner implements MongopushStatusListener {
 			addArg("include", include.toJson());
 		}
 
-		addArg("source", source);
-		addArg("target", target);
+		addArg("source", mongoPushConfiguration.getMongopushSource());
+		addArg("target", mongoPushConfiguration.getMongopushTarget());
 		addArg("yes");
 
 		PumpStreamHandler psh = new PumpStreamHandler(new ExecBasicLogHandler("mongopush", this));
@@ -133,10 +142,9 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	@Override
 	public void initialSyncCompleted(InitialSyncCompletedEvent initialSyncCompletedEvent) {
-		logger.debug("***** initial sync completed {} *****", initialSyncCompletedEvent.getInitialSyncDuration());
-		initialSyncComplete = true;
 		this.initialSyncCompletedEvent = initialSyncCompletedEvent;
-
+		logger.debug("***** initial sync completed {} *****", initialSyncCompletedEvent.getInitialSyncDuration());
+		initialSyncComplete = initialSyncCompletedEvent.getInitialSyncCompleted();
 	}
 
 	@Override
@@ -148,4 +156,13 @@ public class MongopushRunner implements MongopushStatusListener {
 		return processFailed;
 	}
 
+	public void oplogStreamingCompleted(OplogStreamingCompletedEvent oplogStreamingCompletedEvent) {
+		this.oplogStreamingCompletedEvent = oplogStreamingCompletedEvent;
+		logger.debug("***** oplog streaming completed {} *****", oplogStreamingCompletedEvent.isOplogStreamingCompleted());
+		oplogStreamingCompleted = oplogStreamingCompletedEvent.isOplogStreamingCompleted();
+	}
+
+	public boolean isOplogStreamingCompleted() {
+		return oplogStreamingCompleted;
+	}
 }
