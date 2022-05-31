@@ -1,5 +1,7 @@
 package com.mongodb.mongopush;
 
+import static com.mongodb.pocdriver.constants.POCDriverConstants.COLON;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -63,10 +65,9 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	public void execute(MongopushOptions options) throws ExecuteException, IOException {
 
-		logger.debug("execute() MONGOPUSH_BINARY: " + mongoPushConfiguration.getMongopushBinary());
-
+		logger.debug("execute() MONGOPUSH_BINARY: " + mongoPushConfiguration.getMongopushBinaryPath());
 		executeResultHandler = new ExecuteResultHandler(this);
-		cmdLine = new CommandLine(new File(mongoPushConfiguration.getMongopushBinary()));
+		cmdLine = new CommandLine(new File(mongoPushConfiguration.getMongopushBinaryPath()));
 
 		// this currently assumes that mongopush has been modified to accept command
 		// line only

@@ -12,8 +12,8 @@ public class MongoPushConfiguration {
 	@Value("${mongopush.target:mongodb://localhost:27017}")
 	private String mongopushTarget;
 	
-	@Value("${mongopush.binary}")
-	private String mongopushBinary;
+	@Value("${mongopush.binary.path}")
+	private String mongopushBinaryPath;
 
 	public String getMongopushSource() {
 		return mongopushSource;
@@ -31,12 +31,12 @@ public class MongoPushConfiguration {
 		this.mongopushTarget = mongopushTarget;
 	}
 
-	public String getMongopushBinary() {
-		return mongopushBinary;
+	public String getMongopushBinaryPath() {
+		return mongopushBinaryPath;
 	}
 
-	public void setMongopushBinary(String mongopushBinary) {
-		this.mongopushBinary = mongopushBinary;
+	public void setMongopushBinaryPath(String mongopushBinaryPath) {
+		this.mongopushBinaryPath = mongopushBinaryPath;
 	}
 	
 }

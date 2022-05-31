@@ -29,8 +29,8 @@ import com.mongodb.pocdriver.events.InitialDataInsertedEvent;
 import com.mongodb.test.MongoTestClient;
 
 @ExtendWith({SpringExtension.class})
-@TestPropertySource("/pocdrivertest.properties")
-@ContextConfiguration(locations = "/pocdriver-test-context.xml")
+@TestPropertySource("/test.properties")
+@ContextConfiguration(locations = "/test-context.xml")
 @SpringJUnitConfig
 @TestMethodOrder(OrderAnnotation.class)
 public class MongoPushTest01 {

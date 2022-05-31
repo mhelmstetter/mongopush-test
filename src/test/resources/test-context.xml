@@ -9,19 +9,19 @@
 	
     
     <context:component-scan base-package="com.mongodb.mongopush" />
-    <context:component-scan base-package="com.mongodb" />
+	<context:component-scan base-package="com.mongodb.test" />
+    <context:component-scan base-package="com.mongodb.pocdriver" />
     
     <context:property-placeholder location="classpath:test.properties"/>
     
-    
     <bean id="sourceTestClient" class="com.mongodb.test.MongoTestClient">
     	<constructor-arg index="0" value="source"/>
-    	<constructor-arg index="1" value="${source}"/>
+    	<constructor-arg index="1" value="mongodb+srv://gov-mongopush:HvkzKmiA1shW8YkN@mongodbsource.kn30v.mongodb.net/?retryWrites=true"/>
 	</bean>
 	
 	<bean id="targetTestClient" class="com.mongodb.test.MongoTestClient">
     	<constructor-arg index="0" value="target"/>
-    	<constructor-arg index="1" value="${target}"/>
+    	<constructor-arg index="1" value="mongodb+srv://gov-mongopush:HvkzKmiA1shW8YkN@mongodbtarget.kn30v.mongodb.net/?retryWrites=true"/>
 	</bean>
     
 </beans>
