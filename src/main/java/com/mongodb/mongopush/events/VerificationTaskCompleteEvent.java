@@ -1,4 +1,4 @@
-package com.mongodb.mongopush.event;
+package com.mongodb.mongopush.events;
 
 public class VerificationTaskCompleteEvent {
 

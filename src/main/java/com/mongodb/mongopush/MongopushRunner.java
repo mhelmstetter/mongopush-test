@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
-import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
-import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
-import com.mongodb.mongopush.event.VerificationTaskCompleteEvent;
-import com.mongodb.mongopush.event.VerificationTaskFailedEvent;
+import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.exec.ExecBasicLogHandler;
 import com.mongodb.mongopush.exec.ExecuteResultHandler;
 import com.mongodb.mongopush.exec.ProcessExecutor;
@@ -29,15 +29,6 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	private static Logger logger = LoggerFactory.getLogger(MongopushRunner.class);
 
-//	@Value("${mongopushBinary}")
-//	private String mongopushBinary;
-//
-//	@Value("${source}")
-//	private String source;
-//
-//	@Value("${target}")
-//	private String target;
-	
 	@Autowired
 	MongoPushConfiguration mongoPushConfiguration;
 

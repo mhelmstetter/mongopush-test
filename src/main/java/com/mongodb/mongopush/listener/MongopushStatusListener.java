@@ -2,10 +2,10 @@ package com.mongodb.mongopush.listener;
 
 import org.apache.commons.exec.ExecuteException;
 
-import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
-import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
-import com.mongodb.mongopush.event.VerificationTaskCompleteEvent;
-import com.mongodb.mongopush.event.VerificationTaskFailedEvent;
+import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 
 public interface MongopushStatusListener {
 	

@@ -12,10 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.mongopush.MongopushRunner;
-import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
-import com.mongodb.mongopush.event.OplogStreamingCompletedEvent;
-import com.mongodb.mongopush.event.VerificationTaskCompleteEvent;
-import com.mongodb.mongopush.event.VerificationTaskFailedEvent;
+import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
 
 public class ExecBasicLogHandler extends LogOutputStream {
