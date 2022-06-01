@@ -3,6 +3,8 @@ package com.mongodb.mongopush;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.commons.exec.ExecuteException;
@@ -20,8 +22,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.diffutil.DiffSummary;
 import com.mongodb.diffutil.DiffUtilRunner;
+import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
@@ -68,9 +73,8 @@ public class MongoPushTest01 {
 		pocDriverConfiguration.setPocDriverMongodbConnectionString(sourceTestClient.getConnectionString().getConnectionString());
 		mongoPushConfiguration.setMongopushSource(sourceTestClient.getConnectionString().getConnectionString());
 		mongoPushConfiguration.setMongopushTarget(targetTestClient.getConnectionString().getConnectionString());
-		sourceTestClient.dropDatabase("POCDB");
-		targetTestClient.dropDatabase("POCDB");
-		targetTestClient.dropDatabase("_mongopush");
+		sourceTestClient.dropAllDatabasesByName();
+		targetTestClient.dropAllDatabasesByName();
 		pocDriverRunner.initialDataInserted(new InitialDataInsertedEvent(false));
 		pocDriverRunner.documentsInsertedCount(new DocumentsInsertedCountEvent(0));
 		mongopushRunner.initialSyncCompleted(new InitialSyncCompletedEvent(null, false));

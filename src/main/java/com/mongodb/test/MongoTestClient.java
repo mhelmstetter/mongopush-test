@@ -1,8 +1,12 @@
 package com.mongodb.test;
 
 import static com.mongodb.client.model.Filters.regex;
+import static com.mongodb.mongopush.constants.MongoPushConstants.ADMIN;
+import static com.mongodb.mongopush.constants.MongoPushConstants.CONFIG;
+import static com.mongodb.mongopush.constants.MongoPushConstants.LOCAL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +17,6 @@ import org.bson.UuidRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -22,10 +25,10 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.test.faker.FakerService;
-import com.mongodb.util.MaskUtil;
 
 public class MongoTestClient {
 	
@@ -38,6 +41,8 @@ public class MongoTestClient {
 	private ConnectionString connectionString;
 
 	private MongoClientSettings mongoClientSettings;
+	private List<String> databaseNameList;
+	private List<String> databasesNotToDelete = Arrays.asList(ADMIN, CONFIG, LOCAL);;
 
 	private MongoClient mongoClient;
 	
@@ -81,7 +86,6 @@ public class MongoTestClient {
 		}
 	}
 	
-	// TODO - this assumes sharded
 	public List<String> getAllDatabases() {
 		MongoCollection<Document> databasesColl = mongoClient.getDatabase("config").getCollection("databases");
 		FindIterable<Document> databases = databasesColl.find();
@@ -109,16 +113,6 @@ public class MongoTestClient {
 		}
 	}
 	
-	public void dropDatabase(String databaseName) {
-		
-		MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
-		if(mongoDatabase != null)
-		{
-			logger.info("MongoDB Test Database found - {}", databaseName);
-			mongoDatabase.drop();
-		}
-	}
-	
 	private void dropForce(String dbName) {
 		DeleteResult r = mongoClient.getDatabase("config").getCollection("collections")
 				.deleteMany(regex("_id", "^" + dbName + "\\."));
@@ -126,5 +120,33 @@ public class MongoTestClient {
 		r = mongoClient.getDatabase("config").getCollection("chunks").deleteMany(regex("ns", "^" + dbName + "\\."));
 		logger.debug(String.format("Force deleted %s config.chunks documents", r.getDeletedCount()));
 	}
-
+	
+	public List<String> getAllDatabaseNames(){
+		databaseNameList = new ArrayList<String>();
+	    MongoCursor<String> dbsCursor = mongoClient.listDatabaseNames().iterator();
+	    while(dbsCursor.hasNext()) {
+	    	databaseNameList.add(dbsCursor.next());
+	    }
+	    return databaseNameList;
+	}
+	
+	public void dropAllDatabasesByName() {
+		for (String databaseName : getAllDatabaseNames()) {
+			if (!databasesNotToDelete.contains(databaseName)) {
+				logger.debug(name + " dropping " + databaseName);
+				dropDatabase(databaseName);
+			}
+		}
+	}
+	
+	public void dropDatabase(String databaseName) {
+		
+		MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+		if(mongoDatabase != null && mongoDatabase.getName() != null)
+		{
+			logger.info("MongoDB Database found - {}", databaseName);
+			mongoDatabase.drop();
+		}
+	}
+	
 }

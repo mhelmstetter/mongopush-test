@@ -5,6 +5,11 @@ public class MongoPushConstants {
 	public static final String COLON = ":";
 	public static final String SPACE = " ";
 	
+	// Default Database Names
+	public static final String ADMIN = "admin";
+	public static final String CONFIG = "config";
+	public static final String LOCAL = "local";
+	
 	public static final String JAVA = "java";
 	public static final String HYPHEN_JAR = "-jar";
 	public static final String POC_DRIVER = "pocdriver";

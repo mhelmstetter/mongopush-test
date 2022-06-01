@@ -49,13 +49,11 @@ class MongoPushTest {
 	public void beforeEach() {
 		if (!sourceInitialized) {
 			sourceTestClient.dropAllDatabases();
-			sourceTestClient.populateData(2, 2, 10);
+			sourceTestClient.populateData(200, 120, 10);
 			sourceInitialized = true;
 		}
 		targetTestClient.dropAllDatabases();
 	}
-	
-
 	
 	@Test
 	void testInitialSyncOnly() throws ExecuteException, IOException {
@@ -77,13 +75,13 @@ class MongoPushTest {
 	void testIncludes() throws ExecuteException, IOException {
 		
 		Set<Namespace> includeNamespaces = new HashSet<>();
-		includeNamespaces.add(new Namespace("foo.bar"));
-		includeNamespaces.add(new Namespace("foo.bar2"));
+		//includeNamespaces.add(new Namespace("foo.bar"));
+		//includeNamespaces.add(new Namespace("foo.bar2"));
 		
 		MongopushOptions options = MongopushOptions.builder()
 				.mode(MongopushMode.PUSH_DATA)
-				.includeNamespace("foo.bar")
-				.includeNamespace("foo.bar2")
+				//.includeNamespace("foo.bar")
+				//.includeNamespace("foo.bar2")
 				.build();
 		MongopushRunner mongopushRunner = context.getBean(MongopushRunner.class);
 		mongopushRunner.execute(options);

@@ -38,9 +38,16 @@ public class MongopushOptions {
 			sb.append(namespace);
 			sb.append("\"");
 			if (filter != null) {
-				sb.append("\"filter\": \"");
+				sb.append(",\"filter\": ");
+				if(!filter.startsWith("{"))
+				{
+					sb.append("\"");
+				}
 				sb.append(filter);
-				sb.append("\"");
+				if(!filter.endsWith("}"))
+				{
+					sb.append("\"");
+				}
 			}
 			sb.append("}");
 			return sb.toString();
@@ -61,6 +68,21 @@ public class MongopushOptions {
 		public Builder includeNamespace(String namespace) {
 			this.includeOptions.add(new IncludeOption(namespace));
 			this.includeNamespaces.add(new Namespace(namespace));
+			return this;
+		}
+		
+		public Builder includeNamespace(String namespace, String filter) {
+			this.includeOptions.add(new IncludeOption(namespace, filter));
+			this.includeNamespaces.add(new Namespace(namespace));
+			return this;
+		}
+		
+		public Builder includeNamespace(IncludeOption[] includeOptions) {
+			for(IncludeOption includeOption: includeOptions)
+			{
+				this.includeOptions.add(includeOption);
+				this.includeNamespaces.add(new Namespace(includeOption.namespace));
+			}
 			return this;
 		}
 		
