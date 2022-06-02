@@ -8,6 +8,7 @@ public enum MongoPushTestEvent {
 	EXECUTE_MONGO_PUSH_MODE_DATA("ExecuteMongoPushModeData"),
 	EXECUTE_MONGO_PUSH_MODE_DATA_ONLY("ExecuteMongoPushModeDataOnly"),
 	EXECUTE_MONGO_PUSH_MODE_VERIFY("ExecuteMongoPushModeVerify"),
+	EXECUTE_MONGO_PUSH_MODE_REFETCH("ExecuteMongoPushModeRefetch"),
 	INITIAL_SYNC_COMPLETED("InitialSyncCompleted"),
 	OPLOG_STREAMING_COMPLETED("OplogStreamingCompleted"),
 	VERIFICATION_TASK_COMPLETED("VerificationTaskCompleted"),

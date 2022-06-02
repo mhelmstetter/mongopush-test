@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.events.MongoPushTestEvent;
+import com.mongodb.mongopush.events.MongoPushTestSequence;
 import com.mongodb.mongopush.model.MongoPushTestModel;
 
 @Component
@@ -50,17 +51,17 @@ public class MongoPushTestUtility {
 	{
 		JSONParser jsonParser = new JSONParser();
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(new FileReader(filePath));
-		String testSequence = (String) jsonObject.get(TEST_SEQUENCE);
-		String includeOption = null;
-		if(jsonObject.get(INCLUDE_OPTION) != null)
+		String testSequenceName = (String) jsonObject.get(TEST_SEQUENCE_NAME);
+		String includeOptions = null;
+		if(jsonObject.get(INCLUDE_OPTIONS) != null)
 		{
-			includeOption = jsonObject.get(INCLUDE_OPTION).toString();
+			includeOptions = jsonObject.get(INCLUDE_OPTIONS).toString();
 		}
 		
 		String pocDriverArguments = (String) jsonObject.get(POC_DRIVER_ARGUMENTS);
 		
-        List<MongoPushTestEvent> testSequenceEventsList = parseTestSequenceString(testSequence);
-        IncludeOption[] includeOptionArray = parseIncludeOptionsString(includeOption);
+        List<MongoPushTestEvent> testSequenceEventsList = getTestSequenceEvents(testSequenceName);
+        IncludeOption[] includeOptionArray = parseIncludeOptionsString(includeOptions);
         
         MongoPushTestModel mongoPushTestModel = new MongoPushTestModel();
         mongoPushTestModel.setMongoPushTestEvents(testSequenceEventsList);
@@ -115,42 +116,56 @@ public class MongoPushTestUtility {
          
     }
     
-    public List<MongoPushTestEvent> parseTestSequenceString(String testSequence)
-	{
-    	List<MongoPushTestEvent> testSequenceEventsList = null;
-		if(testSequence != null && !testSequence.isBlank())
-		{
-			testSequenceEventsList = new ArrayList<MongoPushTestEvent>();
-			String[] testSequenceEventsArray = testSequence.split("->");
-			for(String eventName : testSequenceEventsArray)
-			{
-				MongoPushTestEvent mongoPushTestEvent = getEventEnumFromName(eventName);
-				if(mongoPushTestEvent != null)
-				{
-					testSequenceEventsList.add(getEventEnumFromName(eventName));
-				}
-				else
-				{
-					testSequenceEventsList = null;
-					break;
-				}
-			}
-		}
-        
-        return testSequenceEventsList;
-	}
+//    public List<MongoPushTestEvent> parseTestSequenceString(String testSequenceName)
+//	{
+//    	List<MongoPushTestEvent> testSequenceEventsList = null;
+//		if(testSequence != null && !testSequence.isBlank())
+//		{
+//			testSequenceEventsList = new ArrayList<MongoPushTestEvent>();
+//			String[] testSequenceEventsArray = testSequence.split("->");
+//			for(String eventName : testSequenceEventsArray)
+//			{
+//				MongoPushTestEvent mongoPushTestEvent = getEventEnumFromName(eventName);
+//				if(mongoPushTestEvent != null)
+//				{
+//					testSequenceEventsList.add(getEventEnumFromName(eventName));
+//				}
+//				else
+//				{
+//					testSequenceEventsList = null;
+//					break;
+//				}
+//			}
+//		}
+//        
+//        return testSequenceEventsList;
+//	}
     
-    private MongoPushTestEvent getEventEnumFromName(String eventName)
+    public List<MongoPushTestEvent> getTestSequenceEvents(String testSequenceName)
     {
-    	MongoPushTestEvent eventNameEnum = null;
-    	for(MongoPushTestEvent mongoPushTestEvent: MongoPushTestEvent.values())
+    	List<MongoPushTestEvent> mongoPushTestEvents = null;
+    	for(MongoPushTestSequence mongoPushTestSequence: MongoPushTestSequence.values())
     	{
-    		if(mongoPushTestEvent.getName().equalsIgnoreCase(eventName))
+    		if(mongoPushTestSequence.name().equalsIgnoreCase(testSequenceName))
     		{
-    			eventNameEnum = mongoPushTestEvent;
+    			mongoPushTestEvents = mongoPushTestSequence.getMongoPushTestEvents();
     			break;
     		}
     	}
-    	return eventNameEnum;
+    	return mongoPushTestEvents;
     }
+    
+//    private MongoPushTestEvent getEventEnumFromName(String eventName)
+//    {
+//    	MongoPushTestEvent eventNameEnum = null;
+//    	for(MongoPushTestEvent mongoPushTestEvent: MongoPushTestEvent.values())
+//    	{
+//    		if(mongoPushTestEvent.getName().equalsIgnoreCase(eventName))
+//    		{
+//    			eventNameEnum = mongoPushTestEvent;
+//    			break;
+//    		}
+//    	}
+//    	return eventNameEnum;
+//    }
 }

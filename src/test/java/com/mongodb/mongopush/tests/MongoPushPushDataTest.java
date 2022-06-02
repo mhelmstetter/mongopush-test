@@ -36,13 +36,12 @@ public class MongoPushPushDataTest extends MongoPushBaseTest {
 		return testSequenceList.stream();
 	}
 	
-	@Order(1)
 	@ParameterizedTest
 	@MethodSource("streamStringParameters")
-	void mongoPushBasicPushDataTest(String testSequence) throws ExecuteException, IOException, InterruptedException {
+	void mongoPushBasicPushDataTest(String testSequenceName) throws ExecuteException, IOException, InterruptedException {
 		
-		logger.info("Test Sequence - {}", testSequence);
-		List<MongoPushTestEvent> testSequenceEventsList = mongoPushTestUtility.parseTestSequenceString(testSequence);
+		logger.info("Test sequence name- {}", testSequenceName);
+		List<MongoPushTestEvent> testSequenceEventsList = mongoPushTestUtility.getTestSequenceEvents(testSequenceName);
 		if(testSequenceEventsList == null)
 		{
 			logger.info("Error in defining test sequence, Please check the test events");
