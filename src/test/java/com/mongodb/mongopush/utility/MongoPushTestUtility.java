@@ -1,6 +1,8 @@
 package com.mongodb.mongopush.utility;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,8 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.mongodb.mongopush.MongoPushTestEvent;
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
+import com.mongodb.mongopush.events.MongoPushTestEvent;
+import com.mongodb.mongopush.model.MongoPushTestModel;
 
 @Component
 public class MongoPushTestUtility {
@@ -23,6 +26,39 @@ public class MongoPushTestUtility {
 	private static Logger logger = LoggerFactory.getLogger(MongoPushTestUtility.class);
 	
 	private static String testResourceBasePath = "src/test/resources/";
+	
+	public static List<String> readAllFilesFromPath(String folderPath)
+	{
+		File folder = new File(testResourceBasePath.concat(folderPath));
+		File[] listOfFiles = folder.listFiles();
+		List<String> testFileNamesList = null;
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile()) {
+				if(testFileNamesList ==  null)
+				{
+					testFileNamesList = new ArrayList<String>();
+				}
+				testFileNamesList.add(listOfFiles[i].getPath());
+			}
+		}
+		return testFileNamesList;
+	}
+	
+	public MongoPushTestModel readFileAndParse(String filePath) throws FileNotFoundException, IOException, ParseException
+	{
+		JSONParser jsonParser = new JSONParser();
+		JSONObject jsonObject = (JSONObject) jsonParser.parse(new FileReader(filePath));
+		String testSequence = (String) jsonObject.get("testSequence");
+        String includeOption = jsonObject.get("includeOption").toString();
+		
+        List<MongoPushTestEvent> testSequenceEventsList = parseTestSequenceString(testSequence);
+        IncludeOption[] includeOptionArray = parseIncludeOptionsString(includeOption);
+        
+        MongoPushTestModel mongoPushTestModel = new MongoPushTestModel();
+        mongoPushTestModel.setMongoPushTestEvents(testSequenceEventsList);
+        mongoPushTestModel.setIncludeOptions(includeOptionArray);
+        return mongoPushTestModel;
+	}
 	
 	public static List<String> fileReader(String filePath) {
 		String fileProjectContextPath = testResourceBasePath.concat(filePath);
@@ -45,14 +81,18 @@ public class MongoPushTestUtility {
 	
 	public IncludeOption[] parseIncludeOptionsString(String includeOption) throws ParseException
 	{
-		JSONParser jsonParser = new JSONParser();
-        Object includeOptionObj = jsonParser.parse(includeOption);
-        JSONArray includeOptionsJsonArray = (JSONArray) includeOptionObj;
-        IncludeOption[] includeOptions = new IncludeOption[includeOptionsJsonArray.size()];
-        for(int i=0;i<includeOptionsJsonArray.size();i++)
-        {
-        	includeOptions[i] = parseIncludeOptionsJsonObject((JSONObject)includeOptionsJsonArray.get(i));
-        }
+		IncludeOption[] includeOptions = null;
+		if(includeOption != null)
+		{
+			JSONParser jsonParser = new JSONParser();
+	        Object includeOptionObj = jsonParser.parse(includeOption);
+	        JSONArray includeOptionsJsonArray = (JSONArray) includeOptionObj;
+	        includeOptions = new IncludeOption[includeOptionsJsonArray.size()];
+	        for(int i=0;i<includeOptionsJsonArray.size();i++)
+	        {
+	        	includeOptions[i] = parseIncludeOptionsJsonObject((JSONObject)includeOptionsJsonArray.get(i));
+	        }
+		}
         
         return includeOptions;
 	}

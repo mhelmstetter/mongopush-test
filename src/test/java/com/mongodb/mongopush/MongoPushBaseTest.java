@@ -1,15 +1,5 @@
 package com.mongodb.mongopush;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -23,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.mongodb.diffutil.DiffUtilRunner;
-import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
@@ -45,16 +34,16 @@ public class MongoPushBaseTest {
 	private static Logger logger = LoggerFactory.getLogger(MongoPushBaseTest.class);
 	
 	@Autowired
-	POCDriverRunner pocDriverRunner;
+	protected POCDriverRunner pocDriverRunner;
 	
 	@Autowired
-	MongopushRunner mongopushRunner;
+	protected MongopushRunner mongopushRunner;
 	
 	@Autowired
-	DiffUtilRunner diffUtilRunner;
+	protected DiffUtilRunner diffUtilRunner;
 	
 	@Autowired
-	POCDriverConfiguration pocDriverConfiguration;
+	protected POCDriverConfiguration pocDriverConfiguration;
 	
 	@Autowired
 	MongoPushConfiguration mongoPushConfiguration;

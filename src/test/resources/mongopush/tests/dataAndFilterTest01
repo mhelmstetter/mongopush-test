@@ -1,0 +1,4 @@
+{
+	"testSequence": "ExecutePOCDriver->InitialDataInserted->ShutDownPOCDriver->ExecuteMongoPushModeData->InitialSyncCompleted->ShutDownMongoPush",
+	"includeOption": [{"namespace":"POCDB.POCCOLL","filter":{"fld0": {"$gt":500000}}}]
+}

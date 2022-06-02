@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.commons.exec.ExecuteException;
-import org.junit.jupiter.api.Order;
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
@@ -16,49 +16,49 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mongodb.diffutil.DiffSummary;
+import com.mongodb.mongopush.MongopushOptions.Builder;
 import com.mongodb.mongopush.events.MongoPushTestEvent;
+import com.mongodb.mongopush.model.MongoPushTestModel;
 import com.mongodb.mongopush.utility.MongoPushTestUtility;
 
-public class MongoPushPushDataTest extends MongoPushBaseTest {
+public class MongoPushDataAndFilterTest extends MongoPushBaseTest {
 
-	private static Logger logger = LoggerFactory.getLogger(MongoPushPushDataTest.class);
+	private static Logger logger = LoggerFactory.getLogger(MongoPushDataAndFilterTest.class);
 
 	@Autowired
 	MongoPushTestUtility mongoPushTestUtility;
 	
-	private static String pushDataTestFilePath = "mongopush/pushDataTests";
+	private static String testFolderPath = "mongopush/tests";
 	
 	private static Stream<String> streamStringParameters() {
-		List<String> testSequenceList = MongoPushTestUtility.fileReader(pushDataTestFilePath);
-		return testSequenceList.stream();
+		List<String> testFileNamesList = MongoPushTestUtility.readAllFilesFromPath(testFolderPath);
+		return testFileNamesList.stream();
 	}
 	
-	@Order(1)
 	@ParameterizedTest
 	@MethodSource("streamStringParameters")
-	void mongoPushBasicPushDataTest(String testSequence) throws ExecuteException, IOException, InterruptedException {
+	void mongoPushBasicPushDataTest(String testFilePath) throws ExecuteException, IOException, InterruptedException, ParseException {
 		
-		logger.info("Test Sequence - {}", testSequence);
-		List<MongoPushTestEvent> testSequenceEventsList = mongoPushTestUtility.parseTestSequenceString(testSequence);
-		if(testSequenceEventsList == null)
+		logger.info("Test file path - {}", testFilePath);
+		MongoPushTestModel mongoPushTestModel = mongoPushTestUtility.readFileAndParse(testFilePath);
+		if(mongoPushTestModel.getMongoPushTestEvents() == null)
 		{
 			logger.info("Error in defining test sequence, Please check the test events");
 		}
 		else {
-			for(MongoPushTestEvent mongoPushTestEvent: testSequenceEventsList)
+			for(MongoPushTestEvent mongoPushTestEvent: mongoPushTestModel.getMongoPushTestEvents())
 			{
-				processTestEventsSequence(mongoPushTestEvent);
+				processTestEventsSequence(mongoPushTestEvent, mongoPushTestModel);
 			}
 		}
 		
-		DiffSummary ds = diffUtilRunner.diff();
-		assertDiffResults(ds);
 	}
 	
-	private void processTestEventsSequence(MongoPushTestEvent mongoPushTestEvent) throws ExecuteException, IOException, InterruptedException
+	private void processTestEventsSequence(MongoPushTestEvent mongoPushTestEvent, MongoPushTestModel mongoPushTestModel) throws ExecuteException, IOException, InterruptedException
 	{
 		logger.info("Processing event - {}", mongoPushTestEvent.getName());
 		MongopushOptions options;
+		Builder mongoPushOptionsBuilder;
 		switch (mongoPushTestEvent) {
 			case EXECUTE_POC_DRIVER:
 				pocDriverRunner.execute();
@@ -77,15 +77,30 @@ public class MongoPushPushDataTest extends MongoPushBaseTest {
 				pocDriverRunner.shutdown();
 				break;
 			case EXECUTE_MONGO_PUSH_MODE_DATA:
-				options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA).build();
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA);
+				if(mongoPushTestModel.getIncludeOptions() != null)
+				{
+					mongoPushOptionsBuilder = mongoPushOptionsBuilder.includeNamespace(mongoPushTestModel.getIncludeOptions());
+				}
+				options = mongoPushOptionsBuilder.build();
 				mongopushRunner.execute(options);
 				break;
 			case EXECUTE_MONGO_PUSH_MODE_DATA_ONLY:
-				options = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY).build();
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY);
+				if(mongoPushTestModel.getIncludeOptions() != null)
+				{
+					mongoPushOptionsBuilder = mongoPushOptionsBuilder.includeNamespace(mongoPushTestModel.getIncludeOptions());
+				}
+				options = mongoPushOptionsBuilder.build();
 				mongopushRunner.execute(options);
 				break;
 			case EXECUTE_MONGO_PUSH_MODE_VERIFY:
-				options = MongopushOptions.builder().mode(MongopushMode.VERIFY).build();
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.VERIFY);
+				if(mongoPushTestModel.getIncludeOptions() != null)
+				{
+					mongoPushOptionsBuilder = mongoPushOptionsBuilder.includeNamespace(mongoPushTestModel.getIncludeOptions());
+				}
+				options = mongoPushOptionsBuilder.build();
 				mongopushRunner.execute(options);
 				break;
 			case INITIAL_SYNC_COMPLETED:
@@ -131,6 +146,9 @@ public class MongoPushPushDataTest extends MongoPushBaseTest {
 			case SHUTDOWN_MONGO_PUSH:
 				mongopushRunner.shutdown();
 				break;
+			case EXECUTE_DIFF_UTIL:
+				DiffSummary ds = diffUtilRunner.diff();
+				assertDiffResults(ds);
 			default:
 				break;
 		}

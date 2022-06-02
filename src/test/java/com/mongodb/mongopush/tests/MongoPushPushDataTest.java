@@ -1,4 +1,4 @@
-package com.mongodb.mongopush;
+package com.mongodb.mongopush.tests;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mongodb.diffutil.DiffSummary;
+import com.mongodb.mongopush.MongoPushBaseTest;
+import com.mongodb.mongopush.MongopushMode;
+import com.mongodb.mongopush.MongopushOptions;
 import com.mongodb.mongopush.events.MongoPushTestEvent;
 import com.mongodb.mongopush.utility.MongoPushTestUtility;
 

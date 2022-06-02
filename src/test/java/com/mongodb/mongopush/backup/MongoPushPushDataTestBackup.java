@@ -1,10 +1,8 @@
-package com.mongodb.mongopush;
+package com.mongodb.mongopush.backup;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.commons.exec.ExecuteException;
@@ -22,11 +20,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.diffutil.DiffSummary;
 import com.mongodb.diffutil.DiffUtilRunner;
-import com.mongodb.mongopush.MongopushOptions.IncludeOption;
+import com.mongodb.mongopush.MongopushMode;
+import com.mongodb.mongopush.MongopushOptions;
+import com.mongodb.mongopush.MongopushRunner;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;

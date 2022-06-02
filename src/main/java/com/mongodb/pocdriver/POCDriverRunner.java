@@ -40,7 +40,6 @@ public class POCDriverRunner implements POCDriverStatusListener {
 		
 		pocDriverLogHandler = new POCDriverLogHandler(POC_DRIVER, this);
 		
-		
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
 		    @Override
 		    public void run() {

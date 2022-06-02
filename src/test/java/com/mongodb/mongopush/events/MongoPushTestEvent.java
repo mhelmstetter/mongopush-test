@@ -1,4 +1,4 @@
-package com.mongodb.mongopush;
+package com.mongodb.mongopush.events;
 
 public enum MongoPushTestEvent {
 
@@ -12,7 +12,8 @@ public enum MongoPushTestEvent {
 	OPLOG_STREAMING_COMPLETED("OplogStreamingCompleted"),
 	VERIFICATION_TASK_COMPLETED("VerificationTaskCompleted"),
 	VERIFICATION_TASK_FAILED("VerificationTaskFailed"),
-	SHUTDOWN_MONGO_PUSH("ShutDownMongoPush");
+	SHUTDOWN_MONGO_PUSH("ShutDownMongoPush"),
+	EXECUTE_DIFF_UTIL("ExecuteDiffUtil");
 	
 	private String name;
 	
