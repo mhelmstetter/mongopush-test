@@ -116,31 +116,6 @@ public class MongoPushTestUtility {
          
     }
     
-//    public List<MongoPushTestEvent> parseTestSequenceString(String testSequenceName)
-//	{
-//    	List<MongoPushTestEvent> testSequenceEventsList = null;
-//		if(testSequence != null && !testSequence.isBlank())
-//		{
-//			testSequenceEventsList = new ArrayList<MongoPushTestEvent>();
-//			String[] testSequenceEventsArray = testSequence.split("->");
-//			for(String eventName : testSequenceEventsArray)
-//			{
-//				MongoPushTestEvent mongoPushTestEvent = getEventEnumFromName(eventName);
-//				if(mongoPushTestEvent != null)
-//				{
-//					testSequenceEventsList.add(getEventEnumFromName(eventName));
-//				}
-//				else
-//				{
-//					testSequenceEventsList = null;
-//					break;
-//				}
-//			}
-//		}
-//        
-//        return testSequenceEventsList;
-//	}
-    
     public List<MongoPushTestEvent> getTestSequenceEvents(String testSequenceName)
     {
     	List<MongoPushTestEvent> mongoPushTestEvents = null;
@@ -155,17 +130,4 @@ public class MongoPushTestUtility {
     	return mongoPushTestEvents;
     }
     
-//    private MongoPushTestEvent getEventEnumFromName(String eventName)
-//    {
-//    	MongoPushTestEvent eventNameEnum = null;
-//    	for(MongoPushTestEvent mongoPushTestEvent: MongoPushTestEvent.values())
-//    	{
-//    		if(mongoPushTestEvent.getName().equalsIgnoreCase(eventName))
-//    		{
-//    			eventNameEnum = mongoPushTestEvent;
-//    			break;
-//    		}
-//    	}
-//    	return eventNameEnum;
-//    }
 }

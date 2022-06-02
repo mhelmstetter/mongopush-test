@@ -64,8 +64,6 @@ public class MongoPushBaseTest {
 	@Autowired
 	MongoTestClient targetTestClient;
 	
-	private static String testResourceBasePath = "src/test/resources/";
-	
 	@BeforeEach
 	public void beforeEach() {
 		pocDriverConfiguration.setPocDriverMongodbConnectionString(sourceTestClient.getConnectionString().getConnectionString());
