@@ -1,11 +1,13 @@
 package com.mongodb.pocdriver;
 
-import static com.mongodb.mongopush.constants.MongoPushConstants.*;
+import static com.mongodb.mongopush.constants.MongoPushConstants.COLON;
+import static com.mongodb.mongopush.constants.MongoPushConstants.HYPHEN_JAR;
+import static com.mongodb.mongopush.constants.MongoPushConstants.JAVA;
+import static com.mongodb.mongopush.constants.MongoPushConstants.POC_DRIVER;
+import static com.mongodb.mongopush.constants.MongoPushConstants.SPACE;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;

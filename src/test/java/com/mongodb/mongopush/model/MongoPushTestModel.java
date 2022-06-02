@@ -7,8 +7,9 @@ import com.mongodb.mongopush.events.MongoPushTestEvent;
 
 public class MongoPushTestModel {
 
-	List<MongoPushTestEvent> mongoPushTestEvents;
-	IncludeOption[] includeOptions;
+	private List<MongoPushTestEvent> mongoPushTestEvents;
+	private IncludeOption[] includeOptions;
+	private String pocdriveArguments;
 	
 	public List<MongoPushTestEvent> getMongoPushTestEvents() {
 		return mongoPushTestEvents;
@@ -21,6 +22,12 @@ public class MongoPushTestModel {
 	}
 	public void setIncludeOptions(IncludeOption[] includeOptions) {
 		this.includeOptions = includeOptions;
+	}
+	public String getPocdriveArguments() {
+		return pocdriveArguments;
+	}
+	public void setPocdriveArguments(String pocdriveArguments) {
+		this.pocdriveArguments = pocdriveArguments;
 	}
 	
 }

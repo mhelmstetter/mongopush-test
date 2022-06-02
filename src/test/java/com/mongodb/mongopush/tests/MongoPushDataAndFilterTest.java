@@ -64,6 +64,10 @@ public class MongoPushDataAndFilterTest extends MongoPushBaseTest {
 		Builder mongoPushOptionsBuilder;
 		switch (mongoPushTestEvent) {
 			case EXECUTE_POC_DRIVER:
+				if(mongoPushTestModel.getPocdriveArguments() != null)
+				{
+					pocDriverConfiguration.setPocDriverCommandlineArguments(mongoPushTestModel.getPocdriveArguments());
+				}
 				pocDriverRunner.execute();
 				break;
 			case INITIAL_DATA_INSERTED:

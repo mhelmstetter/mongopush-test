@@ -1,4 +1,5 @@
 {
 	"testSequence": "ExecutePOCDriver->InitialDataInserted->ShutDownPOCDriver->ExecuteMongoPushModeData->InitialSyncCompleted->ShutDownMongoPush",
-	"includeOption": [{"namespace":"POCDB.POCCOLL","filter":{"fld0": {"$gt":500000}}}]
+	"includeOption": [{"namespace":"POCDB.POCCOLL","filter":{"fld0": {"$gt":500000}}}],
+	"pocdriveArguments" : "-k 2 -i 1 -u 1 -b 2"
 }

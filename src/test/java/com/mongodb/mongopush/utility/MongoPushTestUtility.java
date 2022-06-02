@@ -1,5 +1,7 @@
 package com.mongodb.mongopush.utility;
 
+import static com.mongodb.mongopush.constants.MongoPushConstants.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +27,7 @@ public class MongoPushTestUtility {
 
 	private static Logger logger = LoggerFactory.getLogger(MongoPushTestUtility.class);
 	
-	private static String testResourceBasePath = "src/test/resources/";
+	private static String testResourceBasePath = TEST_RESOURCE_BASE_PATH;
 	
 	public static List<String> readAllFilesFromPath(String folderPath)
 	{
@@ -48,8 +50,14 @@ public class MongoPushTestUtility {
 	{
 		JSONParser jsonParser = new JSONParser();
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(new FileReader(filePath));
-		String testSequence = (String) jsonObject.get("testSequence");
-        String includeOption = jsonObject.get("includeOption").toString();
+		String testSequence = (String) jsonObject.get(TEST_SEQUENCE);
+		String includeOption = null;
+		if(jsonObject.get(INCLUDE_OPTION) != null)
+		{
+			includeOption = jsonObject.get(INCLUDE_OPTION).toString();
+		}
+		
+		String pocDriverArguments = (String) jsonObject.get(POC_DRIVER_ARGUMENTS);
 		
         List<MongoPushTestEvent> testSequenceEventsList = parseTestSequenceString(testSequence);
         IncludeOption[] includeOptionArray = parseIncludeOptionsString(includeOption);
@@ -57,6 +65,7 @@ public class MongoPushTestUtility {
         MongoPushTestModel mongoPushTestModel = new MongoPushTestModel();
         mongoPushTestModel.setMongoPushTestEvents(testSequenceEventsList);
         mongoPushTestModel.setIncludeOptions(includeOptionArray);
+        mongoPushTestModel.setPocdriveArguments(pocDriverArguments);
         return mongoPushTestModel;
 	}
 	
