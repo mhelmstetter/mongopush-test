@@ -1,0 +1,5 @@
+ExecutePOCDriver->InitialDataInserted->ShutDownPOCDriver->ExecuteMongoPushModeData->InitialSyncCompleted->ShutDownMongoPush
+ExecutePOCDriver->InitialDataInserted->ShutDownPOCDriver->ExecuteMongoPushModeDataOnly->InitialSyncCompleted->ShutDownMongoPush
+ExecutePOCDriver->InitialDataInserted->ShutDownPOCDriver->ExecuteMongoPushModeDataOnly->InitialSyncCompleted->ShutDownMongoPush->ExecuteMongoPushModeVerify->VerificationTaskCompleted->ShutDownMongoPush
+ExecutePOCDriver->InitialDataInserted->ExecuteMongoPushModeData->InitialSyncCompleted->ShutDownPOCDriver->OplogStreamingCompleted->ShutDownMongoPush
+ExecutePOCDriver->InitialDataInserted->ExecuteMongoPushModeDataOnly->InitialSyncCompleted->ShutDownMongoPush->ShutDownPOCDriver->ExecuteMongoPushModeVerify->VerificationTaskFailed->ShutDownMongoPush

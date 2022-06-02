@@ -43,9 +43,9 @@ import com.mongodb.test.MongoTestClient;
 @ContextConfiguration(locations = "/test-context.xml")
 @SpringJUnitConfig
 @TestMethodOrder(OrderAnnotation.class)
-public class MongoPushTest01 {
+public class MongoPushPushDataTestBackup {
 
-	private static Logger logger = LoggerFactory.getLogger(MongoPushTest01.class);
+	private static Logger logger = LoggerFactory.getLogger(MongoPushPushDataTestBackup.class);
 	
 	@Autowired
 	POCDriverRunner pocDriverRunner;
