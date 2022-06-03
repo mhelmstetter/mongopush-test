@@ -1,4 +1,4 @@
-package com.mongodb.test;
+package com.mongodb.mongopush.utility;
 
 import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.mongopush.constants.MongoPushConstants.ADMIN;
@@ -28,7 +28,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
-import com.mongodb.test.faker.FakerService;
 
 public class MongoTestClient {
 	

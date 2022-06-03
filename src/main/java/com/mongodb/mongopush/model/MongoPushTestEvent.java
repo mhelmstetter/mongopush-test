@@ -1,4 +1,4 @@
-package com.mongodb.mongopush.events;
+package com.mongodb.mongopush.model;
 
 public enum MongoPushTestEvent {
 

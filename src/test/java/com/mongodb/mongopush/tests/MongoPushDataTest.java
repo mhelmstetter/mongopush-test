@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mongodb.mongopush.MongoPushBaseTest;
-import com.mongodb.mongopush.events.MongoPushTestEvent;
+import com.mongodb.mongopush.model.MongoPushTestEvent;
 import com.mongodb.mongopush.model.MongoPushTestModel;
 import com.mongodb.mongopush.utility.MongoPushTestUtility;
 

@@ -14,12 +14,12 @@
     
     <context:property-placeholder location="classpath:test.properties"/>
 	
-	<bean id="sourceTestClient" class="com.mongodb.test.MongoTestClient">
+	<bean id="sourceTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
     	<constructor-arg index="0" value="source"/>
     	<constructor-arg index="1" value="mongodb://localhost:27017"/>
 	</bean>
 	
-	<bean id="targetTestClient" class="com.mongodb.test.MongoTestClient">
+	<bean id="targetTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
     	<constructor-arg index="0" value="target"/>
     	<constructor-arg index="1" value="mongodb://localhost:27018"/>
 	</bean>

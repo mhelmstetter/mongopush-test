@@ -22,16 +22,17 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.mongodb.diffutil.DiffSummary;
 import com.mongodb.diffutil.DiffUtilRunner;
 import com.mongodb.model.Namespace;
+import com.mongodb.mongopush.MongoPushBaseTest;
 import com.mongodb.mongopush.MongopushMode;
 import com.mongodb.mongopush.MongopushOptions;
 import com.mongodb.mongopush.MongopushRunner;
-import com.mongodb.test.MongoTestClient;
+import com.mongodb.mongopush.utility.MongoTestClient;
 
 @ExtendWith({SpringExtension.class})
 @TestPropertySource("/test.properties")
 @ContextConfiguration(locations = "/test-context.xml")
 @SpringJUnitConfig
-class MongoPushTest {
+class MongoPushTest extends MongoPushBaseTest {
 	
 	@Autowired
 	ApplicationContext context;

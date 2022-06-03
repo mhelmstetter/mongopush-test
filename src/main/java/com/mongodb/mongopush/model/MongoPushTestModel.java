@@ -3,7 +3,6 @@ package com.mongodb.mongopush.model;
 import java.util.List;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
-import com.mongodb.mongopush.events.MongoPushTestEvent;
 
 public class MongoPushTestModel {
 

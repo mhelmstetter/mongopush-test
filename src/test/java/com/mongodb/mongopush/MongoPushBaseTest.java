@@ -23,16 +23,16 @@ import com.mongodb.diffutil.DiffUtilRunner;
 import com.mongodb.mongopush.MongopushOptions.Builder;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
-import com.mongodb.mongopush.events.MongoPushTestEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
 import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
+import com.mongodb.mongopush.model.MongoPushTestEvent;
 import com.mongodb.mongopush.model.MongoPushTestModel;
+import com.mongodb.mongopush.utility.MongoTestClient;
 import com.mongodb.pocdriver.POCDriverRunner;
 import com.mongodb.pocdriver.config.POCDriverConfiguration;
 import com.mongodb.pocdriver.events.DocumentsInsertedCountEvent;
 import com.mongodb.pocdriver.events.InitialDataInsertedEvent;
-import com.mongodb.test.MongoTestClient;
 
 @ExtendWith({SpringExtension.class})
 @TestPropertySource("/test.properties")

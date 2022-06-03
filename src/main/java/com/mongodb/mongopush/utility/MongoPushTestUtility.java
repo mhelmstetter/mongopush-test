@@ -1,6 +1,9 @@
 package com.mongodb.mongopush.utility;
 
-import static com.mongodb.mongopush.constants.MongoPushConstants.*;
+import static com.mongodb.mongopush.constants.MongoPushConstants.INCLUDE_OPTIONS;
+import static com.mongodb.mongopush.constants.MongoPushConstants.POC_DRIVER_ARGUMENTS;
+import static com.mongodb.mongopush.constants.MongoPushConstants.TEST_RESOURCE_BASE_PATH;
+import static com.mongodb.mongopush.constants.MongoPushConstants.TEST_SEQUENCE_NAME;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.mongopush.MongopushOptions.IncludeOption;
-import com.mongodb.mongopush.events.MongoPushTestEvent;
-import com.mongodb.mongopush.events.MongoPushTestSequence;
+import com.mongodb.mongopush.model.MongoPushTestEvent;
 import com.mongodb.mongopush.model.MongoPushTestModel;
+import com.mongodb.mongopush.model.MongoPushTestSequence;
 
 @Component
 public class MongoPushTestUtility {

@@ -1,4 +1,4 @@
-package com.mongodb.test.faker;
+package com.mongodb.mongopush.utility;
 
 import java.util.Calendar;
 import java.util.Date;
