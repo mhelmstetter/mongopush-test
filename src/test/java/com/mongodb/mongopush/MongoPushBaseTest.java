@@ -105,6 +105,18 @@ public class MongoPushBaseTest {
 			case SHUTDOWN_POC_DRIVER:
 				pocDriverRunner.shutdown();
 				break;
+			case POPULATE_DATA_ONE_DATABASE_NAME:
+				if(mongoPushTestModel.getPopulateDataArguments() != null)
+				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(",");
+					sourceTestClient.populateDataForDatabase(populateDataArguments[0], populateDataArguments[1], Integer.valueOf(populateDataArguments[2]));
+				}
+				break;
+			case POPULATE_DATA_MULTIPLE_DATABASE:
+				if(mongoPushTestModel.getPopulateDataArguments() != null)
+				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(",");
+					sourceTestClient.populateData(Integer.valueOf(populateDataArguments[0]), Integer.valueOf(populateDataArguments[1]), Integer.valueOf(populateDataArguments[2]));
+				}
+				break;
 			case EXECUTE_MONGO_PUSH_MODE_DATA:
 				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA);
 				if(mongoPushTestModel.getIncludeOptions() != null)
@@ -177,8 +189,28 @@ public class MongoPushBaseTest {
 					}
 				}
 				break;
+			case REFETCH_TASK_COMPLETED:
+				while (true) {
+					Thread.sleep(5000);
+					if(mongopushRunner.isRefetchTaskComplete())
+					{
+						assertTrue(mongopushRunner.isRefetchTaskComplete());
+						break;
+					}
+				}
+				break;
 			case SHUTDOWN_MONGO_PUSH:
 				mongopushRunner.shutdown();
+				break;
+			case RESUME_MONGO_PUSH:
+				Thread.sleep(20000);
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.RESUME);
+				if(mongoPushTestModel.getIncludeOptions() != null)
+				{
+					mongoPushOptionsBuilder = mongoPushOptionsBuilder.includeNamespace(mongoPushTestModel.getIncludeOptions());
+				}
+				options = mongoPushOptionsBuilder.build();
+				mongopushRunner.execute(options);
 				break;
 			case EXECUTE_DIFF_UTIL:
 				DiffSummary ds = diffUtilRunner.diff();
@@ -186,6 +218,7 @@ public class MongoPushBaseTest {
 			default:
 				break;
 		}
+		logger.info("Processing event completed - {}", mongoPushTestEvent.getName());
 	}
 	
 	private static void assertDiffResults(DiffSummary ds) {

@@ -1,0 +1,5 @@
+{
+	"testSequenceName": "POC_DRIVER_MONGO_PUSH_DATA_SYNC_OPLOG_KILL_RESUME",
+	"includeOptions": [{"namespace":"POCDB.POCCOLL"}],
+	"populateDataArguments" : "POCDB,POCCOLL,500"
+}

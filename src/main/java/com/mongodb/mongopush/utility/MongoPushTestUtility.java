@@ -1,9 +1,13 @@
 package com.mongodb.mongopush.utility;
 
+import static com.mongodb.mongopush.constants.MongoPushConstants.FILTER;
 import static com.mongodb.mongopush.constants.MongoPushConstants.INCLUDE_OPTIONS;
+import static com.mongodb.mongopush.constants.MongoPushConstants.NAMESPACE;
 import static com.mongodb.mongopush.constants.MongoPushConstants.POC_DRIVER_ARGUMENTS;
+import static com.mongodb.mongopush.constants.MongoPushConstants.POPULATE_DATA_ARGUMENTS;
 import static com.mongodb.mongopush.constants.MongoPushConstants.TEST_RESOURCE_BASE_PATH;
 import static com.mongodb.mongopush.constants.MongoPushConstants.TEST_SEQUENCE_NAME;
+import static com.mongodb.mongopush.constants.MongoPushConstants.TO;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,6 +66,7 @@ public class MongoPushTestUtility {
 		}
 		
 		String pocDriverArguments = (String) jsonObject.get(POC_DRIVER_ARGUMENTS);
+		String populateDataArguments = (String) jsonObject.get(POPULATE_DATA_ARGUMENTS);
 		
         List<MongoPushTestEvent> testSequenceEventsList = getTestSequenceEvents(testSequenceName);
         IncludeOption[] includeOptionArray = parseIncludeOptionsString(includeOptions);
@@ -70,6 +75,7 @@ public class MongoPushTestUtility {
         mongoPushTestModel.setMongoPushTestEvents(testSequenceEventsList);
         mongoPushTestModel.setIncludeOptions(includeOptionArray);
         mongoPushTestModel.setPocdriveArguments(pocDriverArguments);
+        mongoPushTestModel.setPopulateDataArguments(populateDataArguments);
         return mongoPushTestModel;
 	}
 	
@@ -112,10 +118,19 @@ public class MongoPushTestUtility {
 	
     private IncludeOption parseIncludeOptionsJsonObject(JSONObject jsonObject) 
     {
-        String namespace = (String) jsonObject.get("namespace");
-        String filter = jsonObject.get("filter").toString();    
-        logger.info("include options - namespace - {}, filter - {}", namespace, filter);
-        return new IncludeOption(namespace, filter);
+        String namespace = (String) jsonObject.get(NAMESPACE);
+        String filter = null;
+        if(jsonObject.get(FILTER) != null)
+        {
+        	filter = jsonObject.get(FILTER).toString();
+        }
+        String to = null;
+        if(jsonObject.get(TO) != null)
+        {
+        	to = (String) jsonObject.get(TO);
+        }
+        logger.info("include options - namespace - {}, filter - {}, to - {}", namespace, filter, to);
+        return new IncludeOption(namespace, filter, to);
          
     }
     

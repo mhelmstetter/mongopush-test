@@ -19,9 +19,16 @@ public class MongoPushConstants {
 	public static final String TEST_SEQUENCE_NAME = "testSequenceName";
 	public static final String INCLUDE_OPTIONS = "includeOptions";
 	public static final String POC_DRIVER_ARGUMENTS = "pocdriveArguments";
+	public static final String POPULATE_DATA_ARGUMENTS = "populateDataArguments";
 	
 	public static final String PUSH = "push";
 	public static final String VERIFY = "verify";
+	public static final String RESUME = "resume";
+	
+	public static final String NAMESPACE = "namespace";
+	public static final String FILTER = "filter";
+	public static final String TO = "to";
 	
 	public static final String TEST_RESOURCE_BASE_PATH = "src/test/resources/";
+	public static final String SNAPSHOT_DATA_PATH = "snapshot/mongopush-data-snapshot.bson.gz";
 }

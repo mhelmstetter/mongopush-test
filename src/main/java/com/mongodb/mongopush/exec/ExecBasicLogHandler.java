@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.mongopush.MongopushRunner;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.RefetchTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
@@ -28,6 +29,8 @@ public class ExecBasicLogHandler extends LogOutputStream {
     Pattern oplogStreamingCompletedPattern = Pattern.compile("^.* lag 0s");
     Pattern verificationTaskCompletePattern = Pattern.compile("^.* Verification tasks complete");
     Pattern verificationTaskFailedPattern = Pattern.compile("^.* Verification Task .* out of retries, failing");
+    Pattern refetchTaskCompletePattern = Pattern.compile("^.* Total (.*) documents (.*)");
+    
     
     private MongopushStatusListener listener;
     
@@ -63,6 +66,13 @@ public class ExecBasicLogHandler extends LogOutputStream {
         Matcher verificationTaskFailedMatcher = verificationTaskFailedPattern.matcher(line);
         if (verificationTaskFailedMatcher.find()) {
         	listener.verificationTaskFailed(new VerificationTaskFailedEvent(true));
+        }
+        
+        Matcher refetchTaskFailedMatcher = refetchTaskCompletePattern.matcher(line);
+        if (refetchTaskFailedMatcher.find()) {
+        	String refetchTaskStr01 = refetchTaskFailedMatcher.group(1);
+        	String refetchTaskStr02 = refetchTaskFailedMatcher.group(2);
+        	listener.refetchTaskComplete(new RefetchTaskCompleteEvent(true, refetchTaskStr01, refetchTaskStr02));
         }
     }
 }

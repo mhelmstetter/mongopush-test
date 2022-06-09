@@ -11,8 +11,6 @@ public class MongopushOptions {
 	private final Set<IncludeOption> includeOptions;
 	private final Set<Namespace> includeNamespaces;
 	
-	
-	
 	private MongopushOptions(final MongopushMode mode, Set<IncludeOption> includeOptions, Set<Namespace> includeNamespaces) {
 		this.mode = mode;
 		this.includeOptions = includeOptions;
@@ -22,14 +20,20 @@ public class MongopushOptions {
 	public static final class IncludeOption {
 		private String namespace;
 		private String filter;
+		private String to;
 		
 		public IncludeOption(String namespace) {
-			this(namespace, null);
+			this(namespace, null, null);
 		}
 		
 		public IncludeOption(String namespace, String filter) {
+			this(namespace, filter, null);
+		}
+		
+		public IncludeOption(String namespace, String filter, String to) {
 			this.namespace = namespace;
 			this.filter = filter;
+			this.to = to;
 		}
 		
 		public String toJson() {
@@ -48,6 +52,11 @@ public class MongopushOptions {
 				{
 					sb.append("\"");
 				}
+			}
+			if (to != null) {
+				sb.append(",\"to\": \"");
+				sb.append(to);
+				sb.append("\"");
 			}
 			sb.append("}");
 			return sb.toString();

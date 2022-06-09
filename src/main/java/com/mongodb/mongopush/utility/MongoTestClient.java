@@ -7,7 +7,9 @@ import static com.mongodb.mongopush.constants.MongoPushConstants.LOCAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -73,16 +75,42 @@ public class MongoTestClient {
 				String collName = "c" + collNum;
 				MongoCollection<Document> coll = db.getCollection(collName);
 				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
-					Document d = new Document("_id", docNum);
-					d.append("uuid", UUID.randomUUID());
-					d.append("startDate", fakerService.getRandomDate());
-					d.append("endDate", fakerService.getRandomDate());
-					docsBuffer.add(d);
+					docsBuffer.add(createDocument());
 				}
 				coll.insertMany(docsBuffer);
 				docsBuffer.clear();
 			}
 		}
+	}
+	
+	public void populateDataForDatabase(String dbName, String collName, int docsPerCollection) {
+		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
+			MongoDatabase db = mongoClient.getDatabase(dbName);
+				MongoCollection<Document> coll = db.getCollection(collName);
+				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
+					docsBuffer.add(createDocument());
+				}
+				coll.insertMany(docsBuffer);
+				docsBuffer.clear();
+	}
+	
+	private Document createDocument()
+	{
+		UUID uuid = UUID.randomUUID();
+		Random random = new Random();
+		Document document = new Document("_id", uuid.toString());
+		document.append("fld0", random.nextLong());
+		document.append("fld1", fakerService.getRandomDate());
+		document.append("fld2", "sit amet. Lorem ipsum dolor");
+		document.append("fld3", fakerService.getRandomText());
+		document.append("fld4", fakerService.getRandomText());
+		document.append("fld5", fakerService.getRandomDate());
+		document.append("fld6", random.nextLong());
+		document.append("fld7", fakerService.getRandomText());
+		document.append("fld8", fakerService.getRandomText());
+		document.append("fld9", random.nextLong());
+		
+		return document;
 	}
 	
 	public List<String> getAllDatabases() {

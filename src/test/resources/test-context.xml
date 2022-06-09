@@ -23,5 +23,6 @@
     	<constructor-arg index="0" value="target"/>
     	<constructor-arg index="1" value="mongodb://localhost:27018"/>
 	</bean>
+
     
 </beans>

@@ -12,11 +12,7 @@ import com.github.javafaker.Faker;
 public class FakerService {
 	
 	Faker faker = new Faker();
-	Random r = new Random();
-	
-	public Date getRandomDate() {
-		return getRandomDate(-5000, 0);
-	}
+	Random random = new Random();
 	
 	public Date getRandomDate(int daysFromCurrentMin, int daysFromCurrentMax) {
         Calendar c = Calendar.getInstance();
@@ -28,5 +24,17 @@ public class FakerService {
         c.set(Calendar.MILLISECOND, 0);
         return c.getTime();
     }
+	
+	public Date getRandomDate()
+	{
+		Date date = new Date();
+		date.setTime((long) (date.getTime() - Math.abs(Math.floor(random.nextGaussian() * 100000000 * 3000))));
+		return date;
+	}
+	
+	public String getRandomText()
+	{
+		return faker.book().title();
+	}
 
 }

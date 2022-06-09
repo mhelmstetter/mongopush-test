@@ -1,6 +1,8 @@
 package com.mongodb.mongopush;
 
 import static com.mongodb.mongopush.constants.MongoPushConstants.PUSH;
+import static com.mongodb.mongopush.constants.MongoPushConstants.RESUME;
+import static com.mongodb.mongopush.constants.MongoPushConstants.SNAPSHOT_DATA_PATH;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import com.mongodb.mongopush.MongopushOptions.IncludeOption;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.RefetchTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.exec.ExecBasicLogHandler;
@@ -47,6 +50,8 @@ public class MongopushRunner implements MongopushStatusListener {
 	private VerificationTaskCompleteEvent verificationTaskCompleteEvent;
 	private boolean verificationTaskFailed;
 	private VerificationTaskFailedEvent verificationTaskFailedEvent;
+	private boolean refetchTaskComplete;
+	private RefetchTaskCompleteEvent refetchTaskCompleteEvent;
 
 	public boolean isComplete() {
 		return executeResultHandler != null && executeResultHandler.hasResult();
@@ -75,6 +80,12 @@ public class MongopushRunner implements MongopushStatusListener {
 				break;
 			case VERIFY:
 				addArg(MongopushMode.VERIFY.getName());
+				break;
+			case REFETCH:
+				addArg(PUSH, MongopushMode.REFETCH.getName());
+				break;
+			case RESUME:
+				addArg(RESUME, SNAPSHOT_DATA_PATH);
 				break;
 			default:
 				break;
@@ -184,5 +195,15 @@ public class MongopushRunner implements MongopushStatusListener {
 
 	public boolean isVerificationTaskFailed() {
 		return verificationTaskFailed;
+	}
+	
+	public void refetchTaskComplete(RefetchTaskCompleteEvent refetchTaskCompleteEvent) {
+		this.refetchTaskCompleteEvent = refetchTaskCompleteEvent;
+		logger.debug("***** Refetch task complete {} {} {}*****", refetchTaskCompleteEvent.isRefetchTaskComplete(), refetchTaskCompleteEvent.getRefetchTaskStr01(), refetchTaskCompleteEvent.getRefetchTaskStr02());
+		refetchTaskComplete = refetchTaskCompleteEvent.isRefetchTaskComplete();
+	}
+
+	public boolean isRefetchTaskComplete() {
+		return refetchTaskComplete;
 	}
 }

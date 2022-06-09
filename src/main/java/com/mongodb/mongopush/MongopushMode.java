@@ -5,7 +5,8 @@ public enum MongopushMode {
 	PUSH_DATA("data"),
 	PUSH_DATA_ONLY("data-only"),
 	VERIFY("verify"),
-	REFETCH("refetch");
+	REFETCH("refetch"),
+	RESUME("resume");
 	
 	private String name;
 	

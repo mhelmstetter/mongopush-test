@@ -9,6 +9,7 @@ public class MongoPushTestModel {
 	private List<MongoPushTestEvent> mongoPushTestEvents;
 	private IncludeOption[] includeOptions;
 	private String pocdriveArguments;
+	private String populateDataArguments;
 	
 	public List<MongoPushTestEvent> getMongoPushTestEvents() {
 		return mongoPushTestEvents;
@@ -27,6 +28,12 @@ public class MongoPushTestModel {
 	}
 	public void setPocdriveArguments(String pocdriveArguments) {
 		this.pocdriveArguments = pocdriveArguments;
+	}
+	public String getPopulateDataArguments() {
+		return populateDataArguments;
+	}
+	public void setPopulateDataArguments(String populateDataArguments) {
+		this.populateDataArguments = populateDataArguments;
 	}
 	
 }
