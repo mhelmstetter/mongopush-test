@@ -16,12 +16,22 @@
 	
 	<bean id="sourceTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
     	<constructor-arg index="0" value="source"/>
-    	<constructor-arg index="1" value="mongodb://localhost:27017"/>
+    	<constructor-arg index="1" value="mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0"/>
 	</bean>
+	
+	<!-- <bean id="targetTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
+    	<constructor-arg index="0" value="target"/>
+    	<constructor-arg index="1" value="mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0"/>
+	</bean> -->
+	
+	<!-- <bean id="sourceTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
+    	<constructor-arg index="0" value="source"/>
+    	<constructor-arg index="1" value="mongodb+srv://gov-mongopush:HvkzKmiA1shW8YkN@mongodbsource.kn30v.mongodb.net/?retryWrites=true"/>
+	</bean> -->
 	
 	<bean id="targetTestClient" class="com.mongodb.mongopush.utility.MongoTestClient">
     	<constructor-arg index="0" value="target"/>
-    	<constructor-arg index="1" value="mongodb://localhost:27018"/>
+    	<constructor-arg index="1" value="mongodb+srv://gov-mongopush:HvkzKmiA1shW8YkN@mongodbtarget.kn30v.mongodb.net/?retryWrites=true"/>
 	</bean>
 
     

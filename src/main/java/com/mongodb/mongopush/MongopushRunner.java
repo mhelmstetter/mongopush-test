@@ -1,6 +1,6 @@
 package com.mongodb.mongopush;
 
-import static com.mongodb.mongopush.constants.MongoPushConstants.PUSH;
+import static com.mongodb.mongopush.constants.MongoPushConstants.*;
 import static com.mongodb.mongopush.constants.MongoPushConstants.RESUME;
 import static com.mongodb.mongopush.constants.MongoPushConstants.SNAPSHOT_DATA_PATH;
 
@@ -86,6 +86,12 @@ public class MongopushRunner implements MongopushStatusListener {
 				break;
 			case RESUME:
 				addArg(RESUME, SNAPSHOT_DATA_PATH);
+				break;
+			case START:
+				addArg(START, MIGRATION_TOOL_CONFIG_JSON);
+				break;
+			case COMPARE:
+				addArg(MongopushMode.COMPARE.getName(), MIGRATION_TOOL_CONFIG_JSON);
 				break;
 			default:
 				break;
@@ -199,7 +205,7 @@ public class MongopushRunner implements MongopushStatusListener {
 	
 	public void refetchTaskComplete(RefetchTaskCompleteEvent refetchTaskCompleteEvent) {
 		this.refetchTaskCompleteEvent = refetchTaskCompleteEvent;
-		logger.debug("***** Refetch task complete {} {} {}*****", refetchTaskCompleteEvent.isRefetchTaskComplete(), refetchTaskCompleteEvent.getRefetchTaskStr01(), refetchTaskCompleteEvent.getRefetchTaskStr02());
+		logger.debug("***** Refetch task completed {} *****", refetchTaskCompleteEvent.isRefetchTaskComplete());
 		refetchTaskComplete = refetchTaskCompleteEvent.isRefetchTaskComplete();
 	}
 

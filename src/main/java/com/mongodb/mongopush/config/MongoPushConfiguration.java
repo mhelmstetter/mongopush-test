@@ -14,6 +14,9 @@ public class MongoPushConfiguration {
 	
 	@Value("${mongopush.binary.path}")
 	private String mongopushBinaryPath;
+	
+	@Value("${mongopush.tests.suite.names}")
+	private String mongopushTestSuiteNames;
 
 	public String getMongopushSource() {
 		return mongopushSource;
@@ -37,6 +40,14 @@ public class MongoPushConfiguration {
 
 	public void setMongopushBinaryPath(String mongopushBinaryPath) {
 		this.mongopushBinaryPath = mongopushBinaryPath;
+	}
+
+	public String getMongopushTestSuiteNames() {
+		return mongopushTestSuiteNames;
+	}
+
+	public void setMongopushTestSuiteNames(String mongopushTestSuiteNames) {
+		this.mongopushTestSuiteNames = mongopushTestSuiteNames;
 	}
 	
 }

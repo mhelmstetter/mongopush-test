@@ -7,6 +7,7 @@ public enum MongoPushTestEvent {
 	SHUTDOWN_POC_DRIVER("ShutDownPOCDriver"),
 	POPULATE_DATA_ONE_DATABASE_NAME("PopulateDataOneDatabaseName"),
 	POPULATE_DATA_MULTIPLE_DATABASE("PopulateDataMultipleDatabase"),
+	DATA_TYPE_OPERATIONS("DataTypeOperations"),
 	EXECUTE_MONGO_PUSH_MODE_DATA("ExecuteMongoPushModeData"),
 	EXECUTE_MONGO_PUSH_MODE_DATA_ONLY("ExecuteMongoPushModeDataOnly"),
 	EXECUTE_MONGO_PUSH_MODE_VERIFY("ExecuteMongoPushModeVerify"),
@@ -18,7 +19,10 @@ public enum MongoPushTestEvent {
 	VERIFICATION_TASK_FAILED("VerificationTaskFailed"),
 	SHUTDOWN_MONGO_PUSH("ShutDownMongoPush"),
 	RESUME_MONGO_PUSH("ResumeMongoPush"),
-	EXECUTE_DIFF_UTIL("ExecuteDiffUtil");
+	FINAL_VERIFICATION_TASK_COMPLETED("FinalVerificationTaskCompleted"),
+	EXECUTE_DIFF_UTIL("ExecuteDiffUtil"),
+	EXECUTE_OTHER_MIGRATION_TOOL("ExecuteOtherMigrationTool"),
+	EXECUTE_OTHER_MIGRATION_TOOL_COMPARE("ExecuteOtherMigrationToolCompare");
 	
 	private String name;
 	

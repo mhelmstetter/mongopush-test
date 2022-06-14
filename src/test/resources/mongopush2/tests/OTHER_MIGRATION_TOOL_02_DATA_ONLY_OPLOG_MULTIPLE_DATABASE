@@ -1,0 +1,4 @@
+{
+	"testSequenceName": "POC_DRIVER_OTHER_MIGRATION_TOOL_DATA_ONLY_SYNC_OPLOG",
+	"pocdriveArguments" : "-k 20 -i 10 -u 10 -b 20"
+}

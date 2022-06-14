@@ -1,7 +1,10 @@
 package com.mongodb.mongopush;
 
+import static com.mongodb.mongopush.constants.MongoPushConstants.COMMA;
+import static com.mongodb.mongopush.constants.MongoPushConstants.SLASH_DOT;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 
@@ -64,6 +67,8 @@ public class MongoPushBaseTest {
 	@Autowired
 	MongoTestClient targetTestClient;
 	
+	private String[] mongopushTestSuitesNames;
+	
 	@BeforeEach
 	public void beforeEach() {
 		pocDriverConfiguration.setPocDriverMongodbConnectionString(sourceTestClient.getConnectionString().getConnectionString());
@@ -79,9 +84,24 @@ public class MongoPushBaseTest {
 		mongopushRunner.verificationTaskFailed(new VerificationTaskFailedEvent(false));
 	}
 	
+	protected boolean isTestSuiteToRun(String testFileName)
+	{
+		mongopushTestSuitesNames = mongoPushConfiguration.getMongopushTestSuiteNames().split(COMMA);
+		boolean testToRun = false;
+		for(String testSuiteName : mongopushTestSuitesNames)
+		{
+			if(testFileName.toLowerCase().contains(testSuiteName))
+			{
+				testToRun = true;
+				break;
+			}
+		}
+		return testToRun;
+	}
+	
 	protected void processTestEventsSequence(MongoPushTestEvent mongoPushTestEvent, MongoPushTestModel mongoPushTestModel) throws ExecuteException, IOException, InterruptedException
 	{
-		logger.info("Processing event - {}", mongoPushTestEvent.getName());
+		logger.info("Processing event started - {}", mongoPushTestEvent.getName());
 		MongopushOptions options;
 		Builder mongoPushOptionsBuilder;
 		switch (mongoPushTestEvent) {
@@ -107,15 +127,40 @@ public class MongoPushBaseTest {
 				break;
 			case POPULATE_DATA_ONE_DATABASE_NAME:
 				if(mongoPushTestModel.getPopulateDataArguments() != null)
-				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(",");
-					sourceTestClient.populateDataForDatabase(populateDataArguments[0], populateDataArguments[1], Integer.valueOf(populateDataArguments[2]));
+				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(COMMA);
+					sourceTestClient.populateDataForDatabase(populateDataArguments[0], populateDataArguments[1], Integer.valueOf(populateDataArguments[2]), false);
 				}
 				break;
 			case POPULATE_DATA_MULTIPLE_DATABASE:
 				if(mongoPushTestModel.getPopulateDataArguments() != null)
-				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(",");
-					sourceTestClient.populateData(Integer.valueOf(populateDataArguments[0]), Integer.valueOf(populateDataArguments[1]), Integer.valueOf(populateDataArguments[2]));
+				{	String[] populateDataArguments = mongoPushTestModel.getPopulateDataArguments().split(COMMA);
+					sourceTestClient.populateData(Integer.valueOf(populateDataArguments[0]), Integer.valueOf(populateDataArguments[1]), Integer.valueOf(populateDataArguments[2]), false);
 				}
+				break;
+			case DATA_TYPE_OPERATIONS:
+				if(mongoPushTestModel.getReplaceDataArguments() != null)
+				{
+					String[] dbCollStr = mongoPushTestModel.getReplaceDataArguments().getNamespace().split(SLASH_DOT);
+					long replacedDocumentCount = sourceTestClient.replaceDocuments(dbCollStr[0], dbCollStr[1], mongoPushTestModel.getReplaceDataArguments().getFilter());
+					logger.info("Number of documents replcaed - {}", replacedDocumentCount);
+				}
+				if(mongoPushTestModel.getIdAsDocumentArguments() != null)
+				{
+					String[] idAsDocumentArgumentsArray = mongoPushTestModel.getIdAsDocumentArguments().split(COMMA);
+					sourceTestClient.populateDataForDatabase(idAsDocumentArgumentsArray[0], idAsDocumentArgumentsArray[1], Integer.valueOf(idAsDocumentArgumentsArray[2]), true);
+					
+				}
+				if(mongoPushTestModel.getUniqueIndexArguments() != null)
+				{
+					String[] uniqueIndexArguments = mongoPushTestModel.getUniqueIndexArguments().split(COMMA);
+					sourceTestClient.populateData(Integer.valueOf(uniqueIndexArguments[0]), Integer.valueOf(uniqueIndexArguments[1]), Integer.valueOf(uniqueIndexArguments[2]), Boolean.valueOf(uniqueIndexArguments[3]));
+				}
+				break;
+			case EXECUTE_OTHER_MIGRATION_TOOL:
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.START);
+				options = mongoPushOptionsBuilder.build();
+				mongopushRunner.execute(options);
+				Thread.sleep(5000);
 				break;
 			case EXECUTE_MONGO_PUSH_MODE_DATA:
 				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA);
@@ -125,6 +170,7 @@ public class MongoPushBaseTest {
 				}
 				options = mongoPushOptionsBuilder.build();
 				mongopushRunner.execute(options);
+				Thread.sleep(5000);
 				break;
 			case EXECUTE_MONGO_PUSH_MODE_DATA_ONLY:
 				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.PUSH_DATA_ONLY);
@@ -141,6 +187,11 @@ public class MongoPushBaseTest {
 				{
 					mongoPushOptionsBuilder = mongoPushOptionsBuilder.includeNamespace(mongoPushTestModel.getIncludeOptions());
 				}
+				options = mongoPushOptionsBuilder.build();
+				mongopushRunner.execute(options);
+				break;
+			case EXECUTE_OTHER_MIGRATION_TOOL_COMPARE:
+				mongoPushOptionsBuilder = MongopushOptions.builder().mode(MongopushMode.COMPARE);
 				options = mongoPushOptionsBuilder.build();
 				mongopushRunner.execute(options);
 				break;
@@ -178,6 +229,23 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.verificationTaskComplete(new VerificationTaskCompleteEvent(false));
+				break;
+			case FINAL_VERIFICATION_TASK_COMPLETED:
+				while (true) {
+					Thread.sleep(5000);
+					if(mongopushRunner.isVerificationTaskFailed())
+					{
+						assertFalse(mongopushRunner.isVerificationTaskFailed());
+						break;
+					}
+					else if(mongopushRunner.isVerificationTaskComplete())
+					{
+						assertTrue(mongopushRunner.isVerificationTaskComplete());
+						break;
+					}
+				}
+				mongopushRunner.verificationTaskComplete(new VerificationTaskCompleteEvent(false));
 				break;
 			case VERIFICATION_TASK_FAILED:
 				while (true) {
@@ -188,6 +256,7 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.verificationTaskFailed(new VerificationTaskFailedEvent(false));
 				break;
 			case REFETCH_TASK_COMPLETED:
 				while (true) {
@@ -201,6 +270,7 @@ public class MongoPushBaseTest {
 				break;
 			case SHUTDOWN_MONGO_PUSH:
 				mongopushRunner.shutdown();
+				Thread.sleep(5000);
 				break;
 			case RESUME_MONGO_PUSH:
 				Thread.sleep(20000);

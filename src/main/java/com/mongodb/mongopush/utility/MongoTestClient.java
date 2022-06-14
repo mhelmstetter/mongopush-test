@@ -4,18 +4,30 @@ import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.mongopush.constants.MongoPushConstants.ADMIN;
 import static com.mongodb.mongopush.constants.MongoPushConstants.CONFIG;
 import static com.mongodb.mongopush.constants.MongoPushConstants.LOCAL;
+import static com.mongodb.mongopush.constants.MongoPushConstants.UNIQUE_FIELD;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.BsonUndefined;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
+import org.bson.conversions.Bson;
+import org.bson.types.Binary;
+import org.bson.types.Decimal128;
+import org.bson.types.MaxKey;
+import org.bson.types.MinKey;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +41,11 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 public class MongoTestClient {
 	
@@ -50,7 +66,6 @@ public class MongoTestClient {
 	public MongoTestClient(String name, String clusterUri) {
 		this.name = name;
 		this.connectionString = new ConnectionString(clusterUri);
-		//logger.debug(String.format("%s client, uri: %s", name, MaskUtil.maskConnectionString(connectionString)));
 	}
 
 	public ConnectionString getConnectionString() {
@@ -66,16 +81,28 @@ public class MongoTestClient {
 		mongoClient = MongoClients.create(mongoClientSettings);
 	}
 	
-	public void populateData(int numDbs, int collectionsPerDb, int docsPerCollection) {
+	public void populateData(int numDbs, int collectionsPerDb, int docsPerCollection, boolean uniqueIndex) {
 		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
 		for (int dbNum = 0; dbNum < numDbs; dbNum++) {
 			String dbName = "db" + dbNum;
+			if(uniqueIndex)
+			{
+				dbName += "unique";
+			}
 			MongoDatabase db = mongoClient.getDatabase(dbName);
 			for (int collNum = 0; collNum < collectionsPerDb; collNum++) {
 				String collName = "c" + collNum;
 				MongoCollection<Document> coll = db.getCollection(collName);
+				
+				if(uniqueIndex)
+				{
+					IndexOptions indexOptions = new IndexOptions().unique(true);
+				    String resultCreateIndex = coll.createIndex(Indexes.ascending(UNIQUE_FIELD), indexOptions);
+				    logger.info(String.format("Unique index created: {}", resultCreateIndex));
+				}
+				
 				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
-					docsBuffer.add(createDocument());
+					docsBuffer.add(createDocument(docNum, false));
 				}
 				coll.insertMany(docsBuffer);
 				docsBuffer.clear();
@@ -83,34 +110,77 @@ public class MongoTestClient {
 		}
 	}
 	
-	public void populateDataForDatabase(String dbName, String collName, int docsPerCollection) {
+	public void populateDataForDatabase(String dbName, String collName, int docsPerCollection, boolean idAsDocument) {
 		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
 			MongoDatabase db = mongoClient.getDatabase(dbName);
 				MongoCollection<Document> coll = db.getCollection(collName);
 				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
-					docsBuffer.add(createDocument());
+					docsBuffer.add(createDocument(docNum, idAsDocument));
 				}
 				coll.insertMany(docsBuffer);
 				docsBuffer.clear();
 	}
 	
-	private Document createDocument()
+	public long replaceDocuments(String dbName, String collName, String filter)
 	{
+		MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
+		MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collName);
+		Bson query = Document.parse(filter);
+        Bson updates = Updates.combine( Updates.addToSet("replaced_document", "Recently replaced"),Updates.currentTimestamp("lastUpdated"));
+        UpdateResult result = mongoCollection.updateMany(query, updates);
+        return result.getModifiedCount();
+	}
+	
+	private Document createDocument(int docNum, boolean idAsDocument)
+	{
+		Document document = new Document();
 		UUID uuid = UUID.randomUUID();
+		if(idAsDocument)
+		{
+			Document idDocument = new Document();
+			idDocument.append("uuid", uuid);
+			idDocument.append("created", fakerService.getRandomDate());
+			document.append("_id", idDocument);
+		}
+		else
+		{
+			document.append("_id", uuid.toString());
+		}
+		document.append(UNIQUE_FIELD, docNum);
+		addDocumentFields(document);
+		return document;
+	}
+	
+	private void addDocumentFields(Document document)
+	{
 		Random random = new Random();
-		Document document = new Document("_id", uuid.toString());
 		document.append("fld0", random.nextLong());
 		document.append("fld1", fakerService.getRandomDate());
 		document.append("fld2", "sit amet. Lorem ipsum dolor");
 		document.append("fld3", fakerService.getRandomText());
 		document.append("fld4", fakerService.getRandomText());
 		document.append("fld5", fakerService.getRandomDate());
-		document.append("fld6", random.nextLong());
-		document.append("fld7", fakerService.getRandomText());
-		document.append("fld8", fakerService.getRandomText());
-		document.append("fld9", random.nextLong());
+		document.append("long_field", random.nextLong());
+		document.append("boolean_field", random.nextBoolean());
+		document.append("double_field", random.nextDouble());
+		document.append("document_field", new Document("uuid", UUID.randomUUID()));
+		String[] cars_array = {"Volvo", "BMW", "Honda"};
+		document.append("array_field", Arrays.asList(cars_array));
 		
-		return document;
+		Map<String, String> documentRandomMap = new HashMap<String, String>();
+		documentRandomMap.put("text_1", fakerService.getRandomText());
+		documentRandomMap.put("text_2", fakerService.getRandomText());
+		document.append("map_field", documentRandomMap);
+		document.append("binary_field", new Binary(fakerService.getRandomText().getBytes()));
+		document.append("objectId_field", new ObjectId());
+		document.append("undefined_field", new BsonUndefined());
+		document.append("null_field", null);
+		document.append("regex_field", Pattern.compile("^.* random regex (.*)"));
+		document.append("integer_field", random.nextInt());
+		document.append("timestamp_field", new Timestamp(new Date().getTime()));
+		document.append("decimal128_field", new Decimal128(random.nextLong()));
+		document.append("minkey_field", new MinKey());
+		document.append("maxkey_field", new MaxKey());
 	}
 	
 	public List<String> getAllDatabases() {

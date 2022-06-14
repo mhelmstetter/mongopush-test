@@ -10,6 +10,9 @@ public class MongoPushTestModel {
 	private IncludeOption[] includeOptions;
 	private String pocdriveArguments;
 	private String populateDataArguments;
+	private ReplaceDataArgumentsModel replaceDataArguments;
+	private String idAsDocumentArguments;
+	private String uniqueIndexArguments;
 	
 	public List<MongoPushTestEvent> getMongoPushTestEvents() {
 		return mongoPushTestEvents;
@@ -34,6 +37,24 @@ public class MongoPushTestModel {
 	}
 	public void setPopulateDataArguments(String populateDataArguments) {
 		this.populateDataArguments = populateDataArguments;
+	}
+	public ReplaceDataArgumentsModel getReplaceDataArguments() {
+		return replaceDataArguments;
+	}
+	public void setReplaceDataArguments(ReplaceDataArgumentsModel replaceDataArguments) {
+		this.replaceDataArguments = replaceDataArguments;
+	}
+	public String getIdAsDocumentArguments() {
+		return idAsDocumentArguments;
+	}
+	public void setIdAsDocumentArguments(String idAsDocumentArguments) {
+		this.idAsDocumentArguments = idAsDocumentArguments;
+	}
+	public String getUniqueIndexArguments() {
+		return uniqueIndexArguments;
+	}
+	public void setUniqueIndexArguments(String uniqueIndexArguments) {
+		this.uniqueIndexArguments = uniqueIndexArguments;
 	}
 	
 }

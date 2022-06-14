@@ -53,7 +53,7 @@ class MongoPushTest extends MongoPushBaseTest {
 	public void beforeEach() {
 		if (!sourceInitialized) {
 			sourceTestClient.dropAllDatabases();
-			sourceTestClient.populateData(200, 120, 10);
+			sourceTestClient.populateData(200, 120, 10, false);
 			sourceInitialized = true;
 		}
 		targetTestClient.dropAllDatabases();

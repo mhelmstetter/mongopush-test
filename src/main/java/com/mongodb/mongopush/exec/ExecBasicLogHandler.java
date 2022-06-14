@@ -29,7 +29,7 @@ public class ExecBasicLogHandler extends LogOutputStream {
     Pattern oplogStreamingCompletedPattern = Pattern.compile("^.* lag 0s");
     Pattern verificationTaskCompletePattern = Pattern.compile("^.* Verification tasks complete");
     Pattern verificationTaskFailedPattern = Pattern.compile("^.* Verification Task .* out of retries, failing");
-    Pattern refetchTaskCompletePattern = Pattern.compile("^.* Total (.*) documents (.*)");
+    Pattern refetchTaskCompletePattern = Pattern.compile("^.* refetch process completed");
     
     
     private MongopushStatusListener listener;
@@ -68,11 +68,9 @@ public class ExecBasicLogHandler extends LogOutputStream {
         	listener.verificationTaskFailed(new VerificationTaskFailedEvent(true));
         }
         
-        Matcher refetchTaskFailedMatcher = refetchTaskCompletePattern.matcher(line);
-        if (refetchTaskFailedMatcher.find()) {
-        	String refetchTaskStr01 = refetchTaskFailedMatcher.group(1);
-        	String refetchTaskStr02 = refetchTaskFailedMatcher.group(2);
-        	listener.refetchTaskComplete(new RefetchTaskCompleteEvent(true, refetchTaskStr01, refetchTaskStr02));
+        Matcher refetchTaskCompleteMatcher = refetchTaskCompletePattern.matcher(line);
+        if (refetchTaskCompleteMatcher.find()) {
+        	listener.refetchTaskComplete(new RefetchTaskCompleteEvent(true));
         }
     }
 }
