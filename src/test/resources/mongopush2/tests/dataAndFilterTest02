@@ -1,4 +1,0 @@
-{
-	"testSequenceName": "POC_DRIVER_MONGO_PUSH_DATA_ONLY_SYNC",
-	"includeOptions": [{"namespace":"POCDB.POCCOLL","filter":{"fld0": {"$gt":500000}}}]
-}

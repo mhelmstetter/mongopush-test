@@ -27,6 +27,7 @@ import com.mongodb.mongopush.MongopushOptions.Builder;
 import com.mongodb.mongopush.config.MongoPushConfiguration;
 import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
 import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.RefetchTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
 import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.model.MongoPushTestEvent;
@@ -76,12 +77,6 @@ public class MongoPushBaseTest {
 		mongoPushConfiguration.setMongopushTarget(targetTestClient.getConnectionString().getConnectionString());
 		sourceTestClient.dropAllDatabasesByName();
 		targetTestClient.dropAllDatabasesByName();
-		pocDriverRunner.initialDataInserted(new InitialDataInsertedEvent(false));
-		pocDriverRunner.documentsInsertedCount(new DocumentsInsertedCountEvent(0));
-		mongopushRunner.initialSyncCompleted(new InitialSyncCompletedEvent(null, false));
-		mongopushRunner.oplogStreamingCompleted(new OplogStreamingCompletedEvent(false));
-		mongopushRunner.verificationTaskComplete(new VerificationTaskCompleteEvent(false));
-		mongopushRunner.verificationTaskFailed(new VerificationTaskFailedEvent(false));
 	}
 	
 	protected boolean isTestSuiteToRun(String testFileName)
@@ -121,6 +116,8 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				pocDriverRunner.initialDataInserted(new InitialDataInsertedEvent(false));
+				pocDriverRunner.documentsInsertedCount(new DocumentsInsertedCountEvent(0));
 				break;
 			case SHUTDOWN_POC_DRIVER:
 				pocDriverRunner.shutdown();
@@ -209,6 +206,7 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.initialSyncCompleted(new InitialSyncCompletedEvent(null, false));
 				break;
 			case OPLOG_STREAMING_COMPLETED:
 				while (true) {
@@ -219,6 +217,7 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.oplogStreamingCompleted(new OplogStreamingCompletedEvent(false));
 				break;
 			case VERIFICATION_TASK_COMPLETED:
 				while (true) {
@@ -245,6 +244,7 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.verificationTaskFailed(new VerificationTaskFailedEvent(false));
 				mongopushRunner.verificationTaskComplete(new VerificationTaskCompleteEvent(false));
 				break;
 			case VERIFICATION_TASK_FAILED:
@@ -267,6 +267,7 @@ public class MongoPushBaseTest {
 						break;
 					}
 				}
+				mongopushRunner.refetchTaskComplete(new RefetchTaskCompleteEvent(false));
 				break;
 			case SHUTDOWN_MONGO_PUSH:
 				mongopushRunner.shutdown();
