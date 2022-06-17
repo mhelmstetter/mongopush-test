@@ -1,6 +1,0 @@
-{
-	"testSequenceName": "POC_DRIVER_MONGO_PUSH_DATA_SYNC_OPLOG_MULTIPLE_DATABASE_VERIFY_REFETCH",
-	"includeOptions": [{"namespace":"POCDB.POCCOLL"},{"namespace":"db0.c0"}],
-	"pocdriveArguments" : "-k 2 -i 1 -u 1 -b 2",
-	"populateDataArguments" : "2,2,10"
-}
