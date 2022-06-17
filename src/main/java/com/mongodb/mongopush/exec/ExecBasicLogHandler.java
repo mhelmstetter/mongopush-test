@@ -12,7 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.mongopush.MongopushRunner;
-import com.mongodb.mongopush.event.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.events.InitialSyncCompletedEvent;
+import com.mongodb.mongopush.events.OplogStreamingCompletedEvent;
+import com.mongodb.mongopush.events.RefetchTaskCompleteEvent;
+import com.mongodb.mongopush.events.VerificationTaskCompleteEvent;
+import com.mongodb.mongopush.events.VerificationTaskFailedEvent;
 import com.mongodb.mongopush.listener.MongopushStatusListener;
 
 public class ExecBasicLogHandler extends LogOutputStream {
@@ -21,7 +25,12 @@ public class ExecBasicLogHandler extends LogOutputStream {
     
     private PrintWriter writer;
     
-    Pattern initialSyncCompleted = Pattern.compile("^.* initial data copy completed, took (.*)");
+    Pattern initialSyncCompletedPattern = Pattern.compile("^.* initial data copy completed, took (.*)");
+    Pattern oplogStreamingCompletedPattern = Pattern.compile("^.* lag 0s");
+    Pattern verificationTaskCompletePattern = Pattern.compile("^.* Verification tasks complete");
+    Pattern verificationTaskFailedPattern = Pattern.compile("^.* Verification Task .* out of retries, failing");
+    Pattern refetchTaskCompletePattern = Pattern.compile("^.* refetch process completed");
+    
     
     private MongopushStatusListener listener;
     
@@ -38,10 +47,30 @@ public class ExecBasicLogHandler extends LogOutputStream {
         writer.println(line);
         writer.flush();
         
-        Matcher m = initialSyncCompleted.matcher(line);
-        if (m.find()) {
-        	String execTimeStr = m.group(1);
-        	listener.initialSyncCompleted(new InitialSyncCompletedEvent(execTimeStr));
+        Matcher initialSyncMatcher = initialSyncCompletedPattern.matcher(line);
+        if (initialSyncMatcher.find()) {
+        	String execTimeStr = initialSyncMatcher.group(1);
+        	listener.initialSyncCompleted(new InitialSyncCompletedEvent(execTimeStr, true));
+        }
+        
+        Matcher oplogStreamingMatcher = oplogStreamingCompletedPattern.matcher(line);
+        if (oplogStreamingMatcher.find()) {
+        	listener.oplogStreamingCompleted(new OplogStreamingCompletedEvent(true));
+        }
+        
+        Matcher verificationTaskCompleteMatcher = verificationTaskCompletePattern.matcher(line);
+        if (verificationTaskCompleteMatcher.find()) {
+        	listener.verificationTaskComplete(new VerificationTaskCompleteEvent(true));
+        }
+        
+        Matcher verificationTaskFailedMatcher = verificationTaskFailedPattern.matcher(line);
+        if (verificationTaskFailedMatcher.find()) {
+        	listener.verificationTaskFailed(new VerificationTaskFailedEvent(true));
+        }
+        
+        Matcher refetchTaskCompleteMatcher = refetchTaskCompletePattern.matcher(line);
+        if (refetchTaskCompleteMatcher.find()) {
+        	listener.refetchTaskComplete(new RefetchTaskCompleteEvent(true));
         }
     }
 }

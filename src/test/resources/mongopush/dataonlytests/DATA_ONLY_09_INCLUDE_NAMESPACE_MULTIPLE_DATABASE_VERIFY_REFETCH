@@ -1,0 +1,7 @@
+{
+	"testSequenceName": "POC_DRIVER_MONGO_PUSH_DATA_ONLY_SYNC_MULTIPLE_DATABASE_VERIFY_REFETCH",
+	"includeOptions": [{"namespace":"POCDB.POCCOLL","filter":{"fld0": {"$gt":500000}}},{"namespace":"db0.c0"}, {"namespace":"db0.c1","filter":{"fld0": {"$gt":300000}}}, {"namespace":"db0.c2","filter":{"fld1": {"$gt":"2019-05-20T23:44:50.311+00:00"}}}, {"namespace":"db1.c3","filter":{"fld3":{"$regex":".*the.*"}}}, {"namespace":"db1.c4"}, {"namespace":"db2.c5","filter":{"fld4":{"$regex":".*Clouds.*"}}}, {"namespace":"db2.c6"},
+{"namespace":"db3.c7","filter":{"boolean_field":false}}, {"namespace":"db3.c8"}],
+	"pocdriveArguments" : "-k 2 -i 1 -u 1 -b 2",
+	"populateDataArguments" : "5,20,200"
+}
