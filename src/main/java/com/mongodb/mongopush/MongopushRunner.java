@@ -105,7 +105,7 @@ public class MongopushRunner implements MongopushStatusListener {
 		addArg("target", mongoPushConfiguration.getMongopushTarget());
 		addArg("yes");
 
-		PumpStreamHandler psh = new PumpStreamHandler(new ExecBasicLogHandler("mongopush", this));
+		PumpStreamHandler psh = new PumpStreamHandler(new ExecBasicLogHandler("mongopush_mode_".concat(options.getMode().getName()), this));
 
 		executor = new ProcessExecutor();
 		executor.setExitValue(0);
