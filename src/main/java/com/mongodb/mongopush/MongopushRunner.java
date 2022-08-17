@@ -96,14 +96,13 @@ public class MongopushRunner implements MongopushStatusListener {
 			default:
 				break;
 		}
-		
+
 		for (IncludeOption include : options.getIncludeOptions()) {
 			addArg("include", include.toJson());
 		}
 
 		addArg("source", mongoPushConfiguration.getMongopushSource());
 		addArg("target", mongoPushConfiguration.getMongopushTarget());
-		addArg("yes");
 
 		PumpStreamHandler psh = new PumpStreamHandler(new ExecBasicLogHandler("mongopush_mode_".concat(options.getMode().getName()), this));
 
@@ -182,7 +181,7 @@ public class MongopushRunner implements MongopushStatusListener {
 	public boolean isOplogStreamingCompleted() {
 		return oplogStreamingCompleted;
 	}
-	
+
 	public void verificationTaskComplete(VerificationTaskCompleteEvent verificationTaskCompleteEvent) {
 		this.verificationTaskCompleteEvent = verificationTaskCompleteEvent;
 		logger.debug("***** Verification task complete {} *****", verificationTaskCompleteEvent.isVerificationTaskComplete());
@@ -192,7 +191,7 @@ public class MongopushRunner implements MongopushStatusListener {
 	public boolean isVerificationTaskComplete() {
 		return verificationTaskComplete;
 	}
-	
+
 	public void verificationTaskFailed(VerificationTaskFailedEvent verificationTaskFailedEvent) {
 		this.verificationTaskFailedEvent = verificationTaskFailedEvent;
 		logger.debug("***** Verification task failed {} *****", verificationTaskFailedEvent.isVerificationTaskFailed());
@@ -202,7 +201,7 @@ public class MongopushRunner implements MongopushStatusListener {
 	public boolean isVerificationTaskFailed() {
 		return verificationTaskFailed;
 	}
-	
+
 	public void refetchTaskComplete(RefetchTaskCompleteEvent refetchTaskCompleteEvent) {
 		this.refetchTaskCompleteEvent = refetchTaskCompleteEvent;
 		logger.debug("***** Refetch task completed {} *****", refetchTaskCompleteEvent.isRefetchTaskComplete());
