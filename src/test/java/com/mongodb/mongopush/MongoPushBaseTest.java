@@ -46,39 +46,40 @@ import com.mongodb.pocdriver.events.InitialDataInsertedEvent;
 public class MongoPushBaseTest {
 
 	private static Logger logger = LoggerFactory.getLogger(MongoPushBaseTest.class);
-	
+
 	@Autowired
 	protected POCDriverRunner pocDriverRunner;
-	
+
 	@Autowired
 	protected MongopushRunner mongopushRunner;
-	
+
 	@Autowired
 	protected DiffUtilRunner diffUtilRunner;
-	
+
 	@Autowired
 	protected POCDriverConfiguration pocDriverConfiguration;
-	
+
 	@Autowired
 	MongoPushConfiguration mongoPushConfiguration;
-	
+
 	@Autowired
 	MongoTestClient sourceTestClient;
-	
+
 	@Autowired
 	MongoTestClient targetTestClient;
-	
+
 	private String[] mongopushTestSuitesNames;
-	
+
 	@BeforeEach
 	public void beforeEach() {
-		pocDriverConfiguration.setPocDriverMongodbConnectionString(sourceTestClient.getConnectionString().getConnectionString());
-		mongoPushConfiguration.setMongopushSource(sourceTestClient.getConnectionString().getConnectionString());
-		mongoPushConfiguration.setMongopushTarget(targetTestClient.getConnectionString().getConnectionString());
+		pocDriverConfiguration.setPocDriverMongodbConnectionString(mongoPushConfiguration.getMongopushSource());
+		sourceTestClient.setConnectionString(mongoPushConfiguration.getMongopushSource());
+		targetTestClient.setConnectionString(mongoPushConfiguration.getMongopushTarget());
+
 		sourceTestClient.dropAllDatabasesByName();
 		targetTestClient.dropAllDatabasesByName();
 	}
-	
+
 	protected boolean isTestSuiteToRun(String testFileName)
 	{
 		mongopushTestSuitesNames = mongoPushConfiguration.getMongopushTestSuiteNames().split(COMMA);
@@ -93,7 +94,7 @@ public class MongoPushBaseTest {
 		}
 		return testToRun;
 	}
-	
+
 	protected void processTestEventsSequence(MongoPushTestEvent mongoPushTestEvent, MongoPushTestModel mongoPushTestModel) throws ExecuteException, IOException, InterruptedException
 	{
 		logger.info("Processing event started - {}", mongoPushTestEvent.getName());
@@ -145,7 +146,7 @@ public class MongoPushBaseTest {
 				{
 					String[] idAsDocumentArgumentsArray = mongoPushTestModel.getIdAsDocumentArguments().split(COMMA);
 					sourceTestClient.populateDataForDatabase(idAsDocumentArgumentsArray[0], idAsDocumentArgumentsArray[1], Integer.valueOf(idAsDocumentArgumentsArray[2]), true);
-					
+
 				}
 				if(mongoPushTestModel.getUniqueIndexArguments() != null)
 				{
@@ -291,7 +292,7 @@ public class MongoPushBaseTest {
 		}
 		logger.info("Processing event completed - {}", mongoPushTestEvent.getName());
 	}
-	
+
 	private static void assertDiffResults(DiffSummary ds) {
 		assertEquals(0, ds.missingDbs);
 		assertEquals(0, ds.totalMissingDocs);

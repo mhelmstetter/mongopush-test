@@ -48,12 +48,12 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 public class MongoTestClient {
-	
+
 	@Autowired
 	private FakerService fakerService;
-	
+
 	private static Logger logger = LoggerFactory.getLogger(MongoTestClient.class);
-	
+
 	private String name;
 	private ConnectionString connectionString;
 
@@ -62,25 +62,28 @@ public class MongoTestClient {
 	private List<String> databasesNotToDelete = Arrays.asList(ADMIN, CONFIG, LOCAL);;
 
 	private MongoClient mongoClient;
-	
-	public MongoTestClient(String name, String clusterUri) {
+
+	public MongoTestClient(String name) {
 		this.name = name;
+	}
+
+	public void setConnectionString(String clusterUri) {
 		this.connectionString = new ConnectionString(clusterUri);
+		connect();
 	}
 
 	public ConnectionString getConnectionString() {
 		return connectionString;
 	}
 
-	@PostConstruct
-	public void init() {
+	public void connect() {
 		mongoClientSettings = MongoClientSettings.builder()
 				.applyConnectionString(connectionString)
 				.uuidRepresentation(UuidRepresentation.STANDARD)
 				.build();
 		mongoClient = MongoClients.create(mongoClientSettings);
 	}
-	
+
 	public void populateData(int numDbs, int collectionsPerDb, int docsPerCollection, boolean uniqueIndex) {
 		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
 		for (int dbNum = 0; dbNum < numDbs; dbNum++) {
@@ -93,14 +96,14 @@ public class MongoTestClient {
 			for (int collNum = 0; collNum < collectionsPerDb; collNum++) {
 				String collName = "c" + collNum;
 				MongoCollection<Document> coll = db.getCollection(collName);
-				
+
 				if(uniqueIndex)
 				{
 					IndexOptions indexOptions = new IndexOptions().unique(true);
 				    String resultCreateIndex = coll.createIndex(Indexes.ascending(UNIQUE_FIELD), indexOptions);
 				    logger.info(String.format("Unique index created: {}", resultCreateIndex));
 				}
-				
+
 				for (int docNum = 0; docNum < docsPerCollection; docNum++) {
 					docsBuffer.add(createDocument(docNum, false));
 				}
@@ -109,7 +112,7 @@ public class MongoTestClient {
 			}
 		}
 	}
-	
+
 	public void populateDataForDatabase(String dbName, String collName, int docsPerCollection, boolean idAsDocument) {
 		List<Document> docsBuffer = new ArrayList<>(docsPerCollection);
 			MongoDatabase db = mongoClient.getDatabase(dbName);
@@ -120,7 +123,7 @@ public class MongoTestClient {
 				coll.insertMany(docsBuffer);
 				docsBuffer.clear();
 	}
-	
+
 	public long replaceDocuments(String dbName, String collName, String filter)
 	{
 		MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
@@ -130,7 +133,7 @@ public class MongoTestClient {
         UpdateResult result = mongoCollection.updateMany(query, updates);
         return result.getModifiedCount();
 	}
-	
+
 	private Document createDocument(int docNum, boolean idAsDocument)
 	{
 		Document document = new Document();
@@ -150,7 +153,7 @@ public class MongoTestClient {
 		addDocumentFields(document);
 		return document;
 	}
-	
+
 	private void addDocumentFields(Document document)
 	{
 		Random random = new Random();
@@ -166,7 +169,7 @@ public class MongoTestClient {
 		document.append("document_field", new Document("uuid", UUID.randomUUID()));
 		String[] cars_array = {"Volvo", "BMW", "Honda"};
 		document.append("array_field", Arrays.asList(cars_array));
-		
+
 		Map<String, String> documentRandomMap = new HashMap<String, String>();
 		documentRandomMap.put("text_1", fakerService.getRandomText());
 		documentRandomMap.put("text_2", fakerService.getRandomText());
@@ -182,7 +185,7 @@ public class MongoTestClient {
 		document.append("minkey_field", new MinKey());
 		document.append("maxkey_field", new MaxKey());
 	}
-	
+
 	public List<String> getAllDatabases() {
 		MongoCollection<Document> databasesColl = mongoClient.getDatabase("config").getCollection("databases");
 		FindIterable<Document> databases = databasesColl.find();
@@ -194,7 +197,7 @@ public class MongoTestClient {
 		}
 		return databasesList;
 	}
-	
+
 	public void dropAllDatabases() {
 		for (String dbName : getAllDatabases()) {
 			if (!dbName.equals("admin")) {
@@ -209,7 +212,7 @@ public class MongoTestClient {
 			}
 		}
 	}
-	
+
 	private void dropForce(String dbName) {
 		DeleteResult r = mongoClient.getDatabase("config").getCollection("collections")
 				.deleteMany(regex("_id", "^" + dbName + "\\."));
@@ -217,7 +220,7 @@ public class MongoTestClient {
 		r = mongoClient.getDatabase("config").getCollection("chunks").deleteMany(regex("ns", "^" + dbName + "\\."));
 		logger.debug(String.format("Force deleted %s config.chunks documents", r.getDeletedCount()));
 	}
-	
+
 	public List<String> getAllDatabaseNames(){
 		databaseNameList = new ArrayList<String>();
 	    MongoCursor<String> dbsCursor = mongoClient.listDatabaseNames().iterator();
@@ -226,7 +229,7 @@ public class MongoTestClient {
 	    }
 	    return databaseNameList;
 	}
-	
+
 	public void dropAllDatabasesByName() {
 		for (String databaseName : getAllDatabaseNames()) {
 			if (!databasesNotToDelete.contains(databaseName)) {
@@ -235,9 +238,9 @@ public class MongoTestClient {
 			}
 		}
 	}
-	
+
 	public void dropDatabase(String databaseName) {
-		
+
 		MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
 		if(mongoDatabase != null && mongoDatabase.getName() != null)
 		{
@@ -245,5 +248,5 @@ public class MongoTestClient {
 			mongoDatabase.drop();
 		}
 	}
-	
+
 }
